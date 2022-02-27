@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "target": "ES2015",
+    "jsx": "react",
+    "declaration": true,
+    "outDir": "lib",
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "src/**/*.test.tsx",
+    "src/setupEnzyme"
+  ]
+}
