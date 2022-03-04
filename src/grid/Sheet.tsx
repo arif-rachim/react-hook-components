@@ -11,7 +11,7 @@ interface CalculateInsideViewPort {
     index: number,
     totalLength: number,
     complete: boolean,
-    lengths: Record<number, number>
+    lengths: Map<number, number>
 }
 
 interface SheetProperties {
@@ -19,8 +19,8 @@ interface SheetProperties {
     columns: [],
     styleContainer?: CSSProperties,
     styleViewPort?: CSSProperties,
-    columnsLength?: Record<number, number>,
-    rowsLength?: Record<number, number>
+    columnsLength?: Map<number, number>,
+    rowsLength?: Map<number, number>
 }
 
 interface CellRendererProps {
@@ -55,12 +55,12 @@ interface RenderComponentProps {
 const defaultDom = document.createElement('div');
 
 export default function Sheet(props: SheetProperties) {
-    props.columnsLength = props.columnsLength || {};
-    props.rowsLength = props.rowsLength || {};
+    const columnsLength = props.columnsLength || new Map<number, number>();
+    const rowsLength = props.rowsLength || new Map<number, number>();
     const [$defaultRowHeight,] = useObserver(20);
     const [$defaultColWidth,] = useObserver(70);
-    const [$customRowHeight,] = useObserver(props.rowsLength);
-    const [$customColWidth,] = useObserver(props.columnsLength);
+    const [$customRowHeight,] = useObserver(rowsLength);
+    const [$customColWidth,] = useObserver(columnsLength);
     const [$viewPortDimension, setViewPortDimension] = useObserver({width: 0, height: 0});
     const [$scrollerPosition, setScrollerPosition] = useObserver({left: 0, top: 0});
     const [elements, setElements] = useState([] as Array<ReactElement>);
@@ -124,12 +124,12 @@ export default function Sheet(props: SheetProperties) {
     </div>
 }
 
-function calculateBeforeViewPort(columns: Array<any>, customLength: Record<number, number>, defaultLength: number, scrollerPosition: number): CalculateBeforeViewPort {
+function calculateBeforeViewPort(columns: Array<any>, customLength: Map<number, number>, defaultLength: number, scrollerPosition: number): CalculateBeforeViewPort {
     return columns.reduce((acc, _, index) => {
         if (acc.complete) {
             return acc;
         }
-        const length = customLength[index] ? customLength[index] : defaultLength;
+        const length = customLength.has(index) ? customLength.get(index) : defaultLength;
         const nextLength = length + acc.totalLength;
         if (nextLength > scrollerPosition) {
             acc.complete = true;
@@ -142,7 +142,7 @@ function calculateBeforeViewPort(columns: Array<any>, customLength: Record<numbe
 }
 
 
-function calculateInsideViewPort(data: Array<any>, indexBeforeViewPort: number, customLength: Record<number, number>, defaultLength: number, viewPortLength: number, lengthBeforeViewPort: number, lengthLastIndexBeforeViewPort: number): CalculateInsideViewPort {
+function calculateInsideViewPort(data: Array<any>, indexBeforeViewPort: number, customLength: Map<number, number>, defaultLength: number, viewPortLength: number, lengthBeforeViewPort: number, lengthLastIndexBeforeViewPort: number): CalculateInsideViewPort {
     return data.slice(indexBeforeViewPort).reduce<CalculateInsideViewPort>((acc, _, zeroIndex) => {
         if (acc.complete) {
             return acc;
@@ -150,27 +150,27 @@ function calculateInsideViewPort(data: Array<any>, indexBeforeViewPort: number, 
 
         const index = indexBeforeViewPort + zeroIndex;
 
-        const length = customLength[index] ? customLength[index] : defaultLength;
+        const length = customLength.has(index) ? customLength.get(index) : defaultLength;
         const nextLength = length + acc.totalLength;
 
         if ((nextLength + lengthLastIndexBeforeViewPort) > (viewPortLength + lengthBeforeViewPort)) {
-
-            acc.lengths[index] = length;
+            acc.lengths.set(index,length);
             acc.index = index;
             acc.totalLength = nextLength;
             acc.complete = true;
             return acc;
         }
-        acc.lengths[index] = length;
+        acc.lengths.set(index,length);
         acc.index = index;
         acc.totalLength = nextLength;
         return acc;
-    }, {index: 0, totalLength: 0, complete: false, lengths: {}} as CalculateInsideViewPort);
+    }, {index: 0, totalLength: 0, complete: false, lengths: new Map<number, number>()} as CalculateInsideViewPort);
 }
 
-function calculateLength(customLength: Record<number, number>, data: Array<any>, defaultLength: number): number {
-    const totalCustomLength = Object.keys(customLength).reduce((acc, key) => acc + customLength[key], 0);
-    const totalDefaultLength = (data.length - Object.keys(customLength).length) * defaultLength;
+function calculateLength(customLength: Map<number, number>, data: Array<any>, defaultLength: number): number {
+    const customLengthKeys = Array.from(customLength.keys());
+    const totalCustomLength = customLengthKeys.reduce((acc, key) => acc + customLength.get(key), 0);
+    const totalDefaultLength = (data.length - customLengthKeys.length) * defaultLength;
     return totalDefaultLength + totalCustomLength;
 }
 
@@ -210,12 +210,12 @@ function renderComponent({
     const {index: lastColIndexBeforeViewPort, totalLength: totalWidthBeforeViewPort} = numberOfColBeforeViewPort;
 
 
-    const {elements} = Array.from({length: Object.keys(heightsOfRowInsideViewPort).length}).reduce<RowAccumulator>((acc, _, rowIndexInsideViewPort) => {
+    const {elements} = Array.from({length: heightsOfRowInsideViewPort.size }).reduce<RowAccumulator>((acc, _, rowIndexInsideViewPort) => {
         const rowIndex = lastRowIndexBeforeViewPort + rowIndexInsideViewPort;
-        const rowHeight = heightsOfRowInsideViewPort[rowIndex];
-        const {elements} = Array.from({length: Object.keys(widthsOfColInsideViewPort).length}).reduce<ColAccumulator>((colAcc, _, colIndexInsideViewPort) => {
+        const rowHeight = heightsOfRowInsideViewPort.get(rowIndex);
+        const {elements} = Array.from({length: widthsOfColInsideViewPort.size}).reduce<ColAccumulator>((colAcc, _, colIndexInsideViewPort) => {
             const colIndex = lastColIndexBeforeViewPort + colIndexInsideViewPort;
-            const colWidth = widthsOfColInsideViewPort[colIndex];
+            const colWidth = widthsOfColInsideViewPort.get(colIndex);
             colAcc.elements.push(<CellRenderer key={`${rowIndex}-${colIndex}`} rowIndex={rowIndex} colIndex={colIndex}
                                                top={acc.top}
                                                width={colWidth}

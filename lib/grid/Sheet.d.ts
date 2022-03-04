@@ -4,8 +4,8 @@ interface SheetProperties {
     columns: [];
     styleContainer?: CSSProperties;
     styleViewPort?: CSSProperties;
-    columnsLength?: Record<number, number>;
-    rowsLength?: Record<number, number>;
+    columnsLength?: Map<number, number>;
+    rowsLength?: Map<number, number>;
 }
 export default function Sheet(props: SheetProperties): JSX.Element;
 export {};
