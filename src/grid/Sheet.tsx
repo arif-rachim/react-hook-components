@@ -14,9 +14,9 @@ interface CalculateInsideViewPort {
     lengths: Map<number, number>
 }
 
-interface SheetProperties {
-    data: [],
-    columns: [],
+interface SheetProperties<DataItem> {
+    data: Array<DataItem>,
+    columns: Array<any>,
     styleContainer?: CSSProperties,
     styleViewPort?: CSSProperties,
     columnsLength?: Map<number, number>,
@@ -54,7 +54,7 @@ interface RenderComponentProps {
 
 const defaultDom = document.createElement('div');
 
-export default function Sheet(props: SheetProperties) {
+export default function Sheet<DataItem>(props: SheetProperties<DataItem>) {
     const columnsLength = props.columnsLength || new Map<number, number>();
     const rowsLength = props.rowsLength || new Map<number, number>();
     const [$defaultRowHeight,] = useObserver(20);

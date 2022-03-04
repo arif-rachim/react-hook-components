@@ -1,11 +1,11 @@
 import { CSSProperties } from "react";
-interface SheetProperties {
-    data: [];
-    columns: [];
+interface SheetProperties<DataItem> {
+    data: Array<DataItem>;
+    columns: Array<any>;
     styleContainer?: CSSProperties;
     styleViewPort?: CSSProperties;
     columnsLength?: Map<number, number>;
     rowsLength?: Map<number, number>;
 }
-export default function Sheet(props: SheetProperties): JSX.Element;
+export default function Sheet<DataItem>(props: SheetProperties<DataItem>): JSX.Element;
 export {};
