@@ -9,7 +9,11 @@ interface VerticalProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * Flexbox Vertical
+ * Vertical is a div element that has a predefined style in the form of
+ * 1. layout : flex,
+ * 2. flex-direction : column
+ * 3. box-sizing : border-box.
+ * Vertical also has vAlign and hAlign attributes, which can be used to adjust the alignment position of its children.
  */
 export default React.forwardRef(function Vertical(props: VerticalProps,ref:ForwardedRef<HTMLDivElement>): JSX.Element {
     const {children, vAlign, hAlign, style, ...properties} = props;
@@ -18,6 +22,7 @@ export default React.forwardRef(function Vertical(props: VerticalProps,ref:Forwa
     return <div ref={ref} style={{
         display: 'flex',
         flexDirection: 'column',
+        boxSizing:'border-box',
         justifyContent,
         alignItems, ...style
     }} {...properties}>{children}</div>

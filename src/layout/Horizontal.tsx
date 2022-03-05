@@ -9,7 +9,11 @@ interface HorizontalProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * Flexbox Horizontal
+ * Horizontal is a div element that has a predefined style in the form of
+ * 1. layout : flex,
+ * 2. flex-direction : row
+ * 3. box-sizing : border-box.
+ * Vertical also has vAlign and hAlign attributes, which can be used to adjust the alignment position of its children.
  */
 export default React.forwardRef(function Horizontal(props: HorizontalProps, ref: ForwardedRef<HTMLDivElement>): JSX.Element {
     const {children, vAlign, hAlign, style, ...properties} = props;
@@ -19,6 +23,7 @@ export default React.forwardRef(function Horizontal(props: HorizontalProps, ref:
     return <div ref={ref} style={{
         display: 'flex',
         flexDirection: 'row',
+        boxSizing:'border-box',
         justifyContent,
         alignItems, ...style
     }} {...properties}>{children}</div>
