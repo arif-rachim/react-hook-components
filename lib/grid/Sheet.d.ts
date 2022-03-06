@@ -18,12 +18,14 @@ interface SheetProperties<DataItem> {
     columns: Array<Column>;
     styleContainer?: CSSProperties;
     styleViewPort?: CSSProperties;
-    $customColWidth: Observer<Map<number, number>>;
-    $customRowHeight: Observer<Map<number, number>>;
+    $customColWidth?: Observer<Map<number, number>>;
+    $customRowHeight?: Observer<Map<number, number>>;
     onScroll?: ScrollListener;
     $scrollLeft?: Observer<number>;
     $scrollTop?: Observer<number>;
     showScroller?: boolean;
+    defaultColWidth?: number;
+    defaultRowHeight?: number;
 }
 export interface CellComponentProps {
     dataSource: Array<any>;
