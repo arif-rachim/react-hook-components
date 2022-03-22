@@ -1,6 +1,6 @@
 {
   "name": "react-hook-components",
-  "version": "1.0.0-alpha.10",
+  "version": "1.0.0-alpha.12",
   "private": false,
   "author": {
     "email": "a.arif.r@gmail.com",
@@ -40,6 +40,7 @@
     "wait-for-expect": "^3.0.2"
   },
   "dependencies": {
-    "react-hook-useobserver": "^1.0.0-alpha.14"
+    "react-hook-useobserver": "^1.0.0-alpha.14",
+    "react-icons": "^4.3.1"
   }
 }

@@ -1,19 +1,30 @@
-import React, { CSSProperties } from "react";
+import React, { CSSProperties, SyntheticEvent } from "react";
 import { Observer } from "react-hook-useobserver/lib/useObserver";
+interface CellSpanFunctionProps {
+    lastRowIndexBeforeViewPort: number;
+    lastRowIndexInsideViewPort: number;
+    lastColIndexBeforeViewPort: number;
+    lastColIndexInsideViewPort: number;
+    rowIndex: number;
+    colIndex: number;
+    dataItem: any;
+    data: Array<any>;
+    columns: Array<Column>;
+    getCellValue: (rowIndex: number, colIndex: number) => any;
+}
+export interface CellSpanFunctionResult {
+    rowSpan?: number;
+    colSpan?: number;
+}
 export interface Column {
     field: string;
-    width: number;
-    title: string;
-    cellComponent: React.FC<CellComponentProps>;
+    width: number | string;
+    cellComponent?: React.FC<CellComponentStyledProps>;
+    cellStyleFunction?: (props: CellStyleFunctionProperties) => CSSProperties;
+    dataItemToValue?: (props: DataItemToValueProps) => string;
+    cellSpanFunction?: (props: CellSpanFunctionProps) => CellSpanFunctionResult;
 }
-export declare const CellComponentString: React.FC<CellComponentProps>;
-declare type ScrollListener = (event: {
-    scrollLeft: number;
-    scrollTop: number;
-    viewportWidth: number;
-    viewportHeight: number;
-}) => void;
-interface SheetProperties<DataItem> {
+export interface SheetProperties<DataItem> {
     data: Array<DataItem>;
     columns: Array<Column>;
     styleContainer?: CSSProperties;
@@ -21,19 +32,61 @@ interface SheetProperties<DataItem> {
     $customColWidth?: Observer<Map<number, number>>;
     $customRowHeight?: Observer<Map<number, number>>;
     onScroll?: ScrollListener;
-    $scrollLeft?: Observer<number>;
-    $scrollTop?: Observer<number>;
     showScroller?: boolean;
-    defaultColWidth?: number;
-    defaultRowHeight?: number;
+    defaultColWidth: number;
+    defaultRowHeight: number;
+    onCellClicked?: CellClickedCallback;
+    onCellClickedCapture?: CellClickedCallback;
+    onCellDoubleClicked?: CellClickedCallback;
+    onCellDoubleClickedCapture?: CellClickedCallback;
+    hideLeftColumnIndex: number;
+    $focusedDataItem?: Observer<any>;
 }
-export interface CellComponentProps {
+interface DataItemToValueProps {
     dataSource: Array<any>;
     dataItem: any;
-    value: any;
     column: Column;
     rowIndex: number;
     colIndex: number;
 }
-export default function Sheet<DataItem>(props: SheetProperties<DataItem>): JSX.Element;
+export interface CellComponentProps extends DataItemToValueProps {
+    value: any;
+    colSpan: number;
+    rowSpan: number;
+}
+interface CellRendererProps extends CellComponentProps {
+    height: number;
+    width: number;
+    top: number;
+    left: number;
+    style?: CSSProperties;
+}
+export interface CellComponentStyledProps extends CellComponentProps {
+    cellStyle: CSSProperties;
+}
+declare type ScrollListener = (event: {
+    scrollLeft: number;
+    scrollTop: number;
+}) => void;
+declare type CellClickedCallback = (event: {
+    event: SyntheticEvent<HTMLDivElement>;
+    rowIndex: number;
+    columnIndex: number;
+    dataItem: any;
+    column: Column;
+    value: any;
+    dataSource: Array<any>;
+}) => void;
+export interface SheetRef {
+    setScrollerPosition: (props: {
+        left: number;
+        top: number;
+    }) => void;
+}
+export declare const Sheet: React.ForwardRefExoticComponent<SheetProperties<unknown> & React.RefAttributes<SheetRef>>;
+interface CellStyleFunctionProperties extends CellRendererProps {
+    focusedItem: any;
+    isFocused: boolean;
+}
+export declare function dataItemToValueDefaultImplementation(props: DataItemToValueProps): any;
 export {};
