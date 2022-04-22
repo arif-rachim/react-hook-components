@@ -1,6 +1,6 @@
 import React, { CSSProperties, SyntheticEvent } from "react";
-import { Observer } from "react-hook-useobserver/lib/useObserver";
-interface CellSpanFunctionProps {
+import { Observer } from "react-hook-useobserver";
+export interface CellSpanFunctionProps {
     lastRowIndexBeforeViewPort: number;
     lastRowIndexInsideViewPort: number;
     lastColIndexBeforeViewPort: number;
@@ -19,10 +19,12 @@ export interface CellSpanFunctionResult {
 export interface Column {
     field: string;
     width: number | string;
+    hAlign: 'left' | 'right' | 'center';
     cellComponent?: React.FC<CellComponentStyledProps>;
     cellStyleFunction?: (props: CellStyleFunctionProperties) => CSSProperties;
     dataItemToValue?: (props: DataItemToValueProps) => string;
     cellSpanFunction?: (props: CellSpanFunctionProps) => CellSpanFunctionResult;
+    payload?: any;
 }
 export interface SheetProperties<DataItem> {
     data: Array<DataItem>;
@@ -41,6 +43,9 @@ export interface SheetProperties<DataItem> {
     onCellDoubleClickedCapture?: CellClickedCallback;
     hideLeftColumnIndex: number;
     $focusedDataItem?: Observer<any>;
+    sheetHeightFollowsTotalRowsHeight?: boolean;
+    rowHeightCallback?: CalculateLengthCallback;
+    colWidthCallback?: CalculateLengthCallback;
 }
 interface DataItemToValueProps {
     dataSource: Array<any>;
@@ -68,7 +73,7 @@ declare type ScrollListener = (event: {
     scrollLeft: number;
     scrollTop: number;
 }) => void;
-declare type CellClickedCallback = (event: {
+export declare type CellClickedCallback = (event: {
     event: SyntheticEvent<HTMLDivElement>;
     rowIndex: number;
     columnIndex: number;
@@ -77,6 +82,13 @@ declare type CellClickedCallback = (event: {
     value: any;
     dataSource: Array<any>;
 }) => void;
+export declare type CalculateLengthCallback = (props: {
+    index: number;
+    length: number;
+    defaultLength: number;
+    data: Array<any>;
+    customLength: Map<number, number>;
+}) => number;
 export interface SheetRef {
     setScrollerPosition: (props: {
         left: number;

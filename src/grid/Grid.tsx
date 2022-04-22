@@ -1,23 +1,28 @@
-
-import {CellComponentProps, Column, dataItemToValueDefaultImplementation, SheetRef,Sheet} from "./Sheet";
-import {ObserverValue, useObserver, useObserverValue} from "react-hook-useobserver";
+import {
+    CalculateLengthCallback,
+    CellComponentProps,
+    CellSpanFunctionProps,
+    CellSpanFunctionResult,
+    Column,
+    dataItemToValueDefaultImplementation,
+    Sheet,
+    SheetRef
+} from "./Sheet";
 import React, {
     createContext,
     FC,
     MouseEvent as ReactMouseEvent,
-    MutableRefObject,
+    MutableRefObject, ReactElement,
     useCallback,
     useContext,
     useEffect,
     useMemo,
     useRef
 } from "react";
-import {Observer} from "react-hook-useobserver/lib/useObserver";
 import {IoArrowDown, IoArrowUp} from "react-icons/io5";
-import {useObserverListener} from "react-hook-useobserver/lib";
 import Vertical from "../layout/Vertical";
 import Horizontal from "../layout/Horizontal";
-
+import {Observer, useObserver,ObserverValue,useObserverListener,useObserverValue} from "react-hook-useobserver";
 
 export interface GridProps {
     data: Array<any>,
@@ -27,17 +32,26 @@ export interface GridProps {
     defaultColWidth?: number,
     focusedDataItem?: any,
     onFocusedDataItemChange?: (newItem: any, oldItem: any) => void,
-    pinnedLeftColumnIndex: number
+    pinnedLeftColumnIndex?: number,
+    rowResizerHidden?: boolean,
+    filterHidden?: boolean,
+    sortableHidden?: boolean,
+    defaultHeaderRowHeight?: number,
+    headerRowHeightCallback?: CalculateLengthCallback,
+    customRowHeight?: Map<number, number>,
+    customColWidth?: Map<number, number>,
+    onCustomColWidthChange?:(customColWidth:Map<number,number>) => void,
+    onCustomRowHeightChange?:(customRowHeight:Map<number,number>) => void
 }
 
 export interface GridColumn extends Column {
-    title: string,
+    title: string|JSX.Element,
     headerCellComponent?: React.FC<HeaderCellComponentProps>,
     filterCellComponent?: React.FC<HeaderCellComponentProps>
 }
 
 export interface GridColumnGroup {
-    title: string,
+    title: string|JSX.Element,
     columns: Array<GridColumnGroup | GridColumn>
 }
 
@@ -58,6 +72,7 @@ const CellComponentForColumnHeaderBase: FC<CellComponentProps> = (props) => {
     const gridColumn: GridColumn = column;
     const CellComponentForColHeader = gridColumn.headerCellComponent || CellComponentForColumnHeader;
     const mousePositionRef = useRef({current: 0, next: 0, dragActive: false});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleDrag = useCallback(dragListener(mousePositionRef, gridContextRef.current.onCellResize, index, containerRef, handlerRef, "horizontal"), []);
     useEffect(() => {
         handlerRef.current.style.left = `${containerRef.current.getBoundingClientRect().width - Math.ceil(0.5 * HANDLER_LENGTH)}px`;
@@ -74,21 +89,22 @@ const CellComponentForColumnHeaderBase: FC<CellComponentProps> = (props) => {
         flexGrow: 0,
         position: 'relative'
     }}>
+
         <CellComponentForColHeader column={gridColumn} colIndex={props.colIndex} rowIndex={props.rowIndex}
                                    field={gridColumn.field}
                                    title={title} dataSource={props.dataSource} rowSpan={props.rowSpan}
                                    colSpan={props.colSpan}/>
         {shouldHaveResizeHandler &&
-        <Vertical ref={handlerRef} style={{
-            height: '100%',
-            position: 'absolute',
-            backgroundColor: 'rgba(0,0,0,0)',
-            width: HANDLER_LENGTH,
-            zIndex: 1,
-            top: 0,
-            boxSizing: 'border-box',
-            cursor: 'col-resize'
-        }} onMouseDown={handleDrag} />
+            <Vertical ref={handlerRef} style={{
+                height: '100%',
+                position: 'absolute',
+                backgroundColor: 'rgba(0,0,0,0)',
+                width: HANDLER_LENGTH,
+                zIndex: 1,
+                top: 0,
+                boxSizing: 'border-box',
+                cursor: 'col-resize'
+            }} onMouseDown={handleDrag}/>
         }
     </Vertical>;
 };
@@ -100,6 +116,7 @@ const CellComponentToResizeRow: React.FC<CellComponentProps> = (props: CellCompo
 
     const gridContextRef = useContext(GridContext);
     const mousePositionRef = useRef({current: 0, next: 0, dragActive: false});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleDrag = useCallback(dragListener(mousePositionRef, gridContextRef.current.onRowResize, index, containerRef, handlerBottomRef, "vertical"), []);
     useEffect(() => {
         handlerBottomRef.current.style.top = `${containerRef.current.getBoundingClientRect().height - Math.ceil(0.5 * HANDLER_LENGTH)}px`;
@@ -122,7 +139,7 @@ const CellComponentToResizeRow: React.FC<CellComponentProps> = (props: CellCompo
             left: 0,
             boxSizing: 'border-box',
             cursor: 'pointer'
-        }} onMouseDown={handleDrag} />
+        }} onMouseDown={handleDrag}/>
     </Vertical>
 };
 
@@ -206,7 +223,7 @@ const GridContext = createContext<MutableRefObject<GridContextType>>({
         onRowResize: noOp,
         setGridFilter: noOp,
         commitFilterChange: noOp,
-        props: {data: [], columns: [], pinnedLeftColumnIndex: -1}
+        props: {data: [], columns: []}
     }
 });
 
@@ -222,13 +239,13 @@ function SortComponent({field}: { field: string }) {
         const sort = gridSort.find(sort => sort.field === field);
         return sort?.direction;
     });
-    return <Vertical style={{flexShrink: 0, flexGrow: 0, marginLeft: 0,color:'crimson'}}>
+    return <Vertical style={{flexShrink: 0, flexGrow: 0, marginLeft: 0, color: 'crimson'}}>
         {direction === SORT_DIRECTION.ASC && <IoArrowUp/>}
         {direction === SORT_DIRECTION.DESC && <IoArrowDown/>}
     </Vertical>;
 }
 
-interface HeaderCellComponentProps {
+export interface HeaderCellComponentProps {
     field: string,
     title: string,
     column: Column,
@@ -240,13 +257,16 @@ interface HeaderCellComponentProps {
 }
 
 export function CellComponentForColumnHeader(props: HeaderCellComponentProps) {
+
     const column: any = props.column;
     const gridColumn: GridColumn = column;
     const FilterCellComponent: React.FC<HeaderCellComponentProps> = gridColumn.filterCellComponent || CellComponentForColumnHeaderFilter;
     const gridContextRef = useContext(GridContext);
+    const filterHidden = gridContextRef.current.props.filterHidden;
+    const sortableHidden = gridContextRef.current.props.sortableHidden;
 
     function handleSortClicked() {
-        if (!gridContextRef.current.setGridSort) {
+        if ((!gridContextRef.current.setGridSort) || sortableHidden === true) {
             return;
         }
         gridContextRef.current.setGridSort((oldVal: Array<GridSortItem>) => {
@@ -269,19 +289,21 @@ export function CellComponentForColumnHeader(props: HeaderCellComponentProps) {
 
     const shouldHaveFilter = (props.rowIndex + (props?.rowSpan || 0)) === props.dataSource.length;
     return <Vertical style={{height: '100%'}}>
-        <Horizontal style={{flexGrow: 1, padding: '0px 5px', backgroundColor: '#eee', color: '#333'}} vAlign={'center'}
-                    onClick={handleSortClicked}>
-            <Vertical>
+        <Vertical style={{flexGrow: 1, padding: '0px 5px', backgroundColor: '#ddd', color: '#333', fontWeight: 'bold'}}
+                  hAlign={props.column.hAlign}
+                  vAlign={'center'}
+                  onClick={handleSortClicked}>
+            <Horizontal>
                 {props.title}
-            </Vertical>
-            {shouldHaveFilter &&
-            <SortComponent field={gridColumn.field}/>
-            }
-        </Horizontal>
-        {shouldHaveFilter &&
-        <FilterCellComponent title={props.title} field={props.field} colIndex={props.colIndex} column={gridColumn}
-                             rowIndex={props.rowIndex} dataSource={props.dataSource} colSpan={props.colSpan}
-                             rowSpan={props.colSpan}/>
+                {shouldHaveFilter &&
+                    <SortComponent field={gridColumn.field}/>
+                }
+            </Horizontal>
+        </Vertical>
+        {shouldHaveFilter && filterHidden !== true &&
+            <FilterCellComponent title={props.title} field={props.field} colIndex={props.colIndex} column={gridColumn}
+                                 rowIndex={props.rowIndex} dataSource={props.dataSource} colSpan={props.colSpan}
+                                 rowSpan={props.colSpan}/>
         }
     </Vertical>;
 }
@@ -295,13 +317,13 @@ function CellComponentForColumnHeaderFilter(props: HeaderCellComponentProps) {
     });
     return <Vertical style={{borderTop: '1px solid #ddd'}}>
         <input type="text" value={value} style={{border: 'none', borderRadius: 0, padding: '2px 5px'}}
-                onChange={(event) => {
-            gridContextRef.current.setGridFilter((oldVal: Map<string, any>) => {
-                const newMap = new Map<string, any>(oldVal);
-                newMap.set(props.field, event.target.value);
-                return newMap;
-            })
-        }} onKeyUp={(event) => {
+               onChange={(event) => {
+                   gridContextRef.current.setGridFilter((oldVal: Map<string, any>) => {
+                       const newMap = new Map<string, any>(oldVal);
+                       newMap.set(props.field, event.target.value);
+                       return newMap;
+                   })
+               }} onKeyUp={(event) => {
 
             if (event.key === 'Enter') {
                 event.preventDefault();
@@ -340,8 +362,8 @@ function compareValue(props: { prev: any, next: any, gridSort: Array<GridSortIte
         rowIndex: dataSource.indexOf(next),
         dataSource
     });
-    const prevLowerCase = prevValue.toLowerCase();
-    const nextLowerCase = nextValue.toLowerCase();
+    const prevLowerCase = (prevValue || '').toLowerCase();
+    const nextLowerCase = (nextValue || '').toLowerCase();
     if (prevLowerCase === nextLowerCase) {
         return compareValue({prev, next, gridSort, index: index + 1, columns, dataSource});
     }
@@ -372,7 +394,7 @@ function filterDataSource(dataSource: Array<any>, $gridFilter: Observer<Map<stri
 
 function convertColumnsPropsToColumns(columnsProp: Array<GridColumn | GridColumnGroup>): Array<GridColumn> {
     let columns: Array<GridColumn> = [];
-    columnsProp.map((column: any) => {
+    columnsProp.forEach((column: any) => {
         if ('columns' in column) {
             columns = columns.concat(convertColumnsPropsToColumns(column.columns));
         } else {
@@ -387,7 +409,8 @@ function populateHeaderDataMap(columnsProp: Array<GridColumnGroup | GridColumn>,
         if (!headerDataMap.has(rowIdx)) {
             headerDataMap.set(rowIdx, new Map<string, string>());
         }
-        const row: Map<string, string> = (headerDataMap.get(rowIdx) || new Map<string, string>());
+        const row: Map<string, string|ReactElement> = (headerDataMap.get(rowIdx) || new Map<string, ReactElement>());
+
         if ('columns' in column) {
             populateHeaderDataMap(column.columns, headerDataMap, rowIdx + 1, (field: string) => {
                 if (setParentRowField) {
@@ -432,41 +455,86 @@ function constructHeaderData(columnsProp: Array<GridColumnGroup | GridColumn>) {
 }
 
 export function Grid(gridProps: GridProps) {
-    const {data: dataProp, focusedDataItem, columns: columnsProp, onFilterChange, defaultRowHeight: _defaultRowHeight, defaultColWidth: _defaultCoWidth, pinnedLeftColumnIndex} = gridProps;
+    const {
+        data: dataProp,
+        focusedDataItem,
+        columns: columnsProp,
+        onFilterChange,
+        defaultRowHeight: _defaultRowHeight,
+        defaultColWidth: _defaultCoWidth,
+        pinnedLeftColumnIndex,
+        rowResizerHidden,
+        defaultHeaderRowHeight,
+        headerRowHeightCallback,
+        customRowHeight,
+        customColWidth,
+        onCustomColWidthChange,
+        onCustomRowHeightChange
+    } = gridProps;
+
     const defaultRowHeight = _defaultRowHeight || DEFAULT_HEIGHT;
     const defaultColWidth = _defaultCoWidth || DEFAULT_WIDTH;
     const [$columns, setColumns] = useObserver(() => convertColumnsPropsToColumns(columnsProp));
 
     const [$data, setData] = useObserver(dataProp);
     const [$viewPortDimension, setViewPortDimension] = useObserver({width: 0, height: 0});
-    const [$customColWidth, setCustomColWidth] = useObserver(new Map<number, number>());
-    const [$customRowHeight, setCustomRowHeight] = useObserver(new Map<number, number>());
+    const [$customColWidth, setCustomColWidth] = useObserver(customColWidth || new Map<number, number>());
+    const [$customRowHeight, setCustomRowHeight] = useObserver(customRowHeight || new Map<number, number>());
+
+    useObserverListener($customColWidth,() => {
+        const changeCallback = onCustomColWidthChange || (() => {});
+        if($customColWidth.current.size > 0){
+            changeCallback($customColWidth.current);
+        }
+    });
+    useObserverListener($customRowHeight,() => {
+        const changeCallback = onCustomRowHeightChange || (() => {});
+        if($customRowHeight.current.size > 0){
+            changeCallback($customRowHeight.current);
+        }
+
+    });
     const [$gridFilter, setGridFilter] = useObserver(new Map<string, any>());
     const [$gridSort, setGridSort] = useObserver<Array<GridSortItem>>([]);
     const [$focusedDataItem, setFocusedDataItem] = useObserver(focusedDataItem);
     const [$pinnedLeftColumnWidth, setPinnedLeftColumnWidth] = useObserver(0);
     const viewportRef = useRef(defaultDif);
 
-    const gridHeaderRef = useRef<SheetRef>({setScrollerPosition:() => {}});
+    const gridHeaderRef = useRef<SheetRef>({
+        setScrollerPosition: () => {
+        }
+    });
 
-    const gridLeftPinnedRef = useRef<SheetRef>({setScrollerPosition:() => {}});
-    const gridRowResizerRef = useRef<SheetRef>({setScrollerPosition:() => {}});
-
-    useEffect(() => setViewPortDimension(viewportRef.current.getBoundingClientRect()), []);
-    useEffect(() => setFocusedDataItem(focusedDataItem), [focusedDataItem]);
+    const gridLeftPinnedRef = useRef<SheetRef>({
+        setScrollerPosition: () => {
+        }
+    });
+    const gridRowResizerRef = useRef<SheetRef>({
+        setScrollerPosition: () => {
+        }
+    });
+    const hideLeftColumnIndex = pinnedLeftColumnIndex !== undefined && pinnedLeftColumnIndex >= 0 ? pinnedLeftColumnIndex : -1;
+    useEffect(() => setViewPortDimension(viewportRef.current.getBoundingClientRect()), [setViewPortDimension]);
+    useEffect(() => setFocusedDataItem(focusedDataItem), [focusedDataItem, setFocusedDataItem]);
     useObserverListener([$viewPortDimension, $columns], () => {
         if ($viewPortDimension.current.width > 0) {
+            const propsCustomColWidth = gridProps.customColWidth || new Map<number, number>();
+
+
             const columnsWidth = new Map<number, number>();
             const columnsWidthPercentage = new Map<number, number>();
             let totalColumnsWidth = 0;
             let totalPercentage = 0;
             const viewPortWidth = $viewPortDimension.current.width - SCROLLER_WIDTH;
             $columns.current.forEach((column, columnIndex) => {
-                if (typeof column.width === 'number') {
+                if(propsCustomColWidth.has(columnIndex)){
+                    const width = propsCustomColWidth.get(columnIndex) || 0
+                    totalColumnsWidth += width;
+                    columnsWidth.set(columnIndex, width);
+                }else if (typeof column.width === 'number') {
                     totalColumnsWidth += column.width;
                     columnsWidth.set(columnIndex, column.width);
-                }
-                if (typeof column.width === 'string' && column.width.endsWith('%')) {
+                }else if (typeof column.width === 'string' && column.width.endsWith('%')) {
                     const widthInPercentage = parseInt(column.width.replace('%', ''));
                     columnsWidthPercentage.set(columnIndex, widthInPercentage);
                     totalPercentage += widthInPercentage;
@@ -488,16 +556,19 @@ export function Grid(gridProps: GridProps) {
         }
     });
     useObserverListener($customColWidth, () => {
-        const pinnedLeftColWidth = Array.from($customColWidth.current.entries()).filter((value) => value[0] <= pinnedLeftColumnIndex).reduce((acc, val) => acc + val[1], 0);
+        const pinnedLeftColWidth = Array.from($customColWidth.current.entries()).filter((value) => value[0] <= hideLeftColumnIndex).reduce((acc, val) => acc + val[1], 0);
         setPinnedLeftColumnWidth(pinnedLeftColWidth);
     });
-    const headerData: Array<any> = useMemo(constructHeaderData(columnsProp), []);
-    useEffect(() => setData(dataProp), [dataProp]);
-    useEffect(() => setColumns(convertColumnsPropsToColumns(columnsProp)), [columnsProp]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const headerData: Array<any> = useMemo(constructHeaderData(columnsProp), [columnsProp]);
+    useEffect(() => setData(dataProp), [dataProp, setData]);
+    useEffect(() => setColumns(convertColumnsPropsToColumns(columnsProp)), [columnsProp, setColumns]);
     const columnDataToResizeRow: Array<GridColumn> = useMemo(() => ([{
         field: '_',
         width: FIRST_COLUMN_WIDTH,
         title: ' ',
+        hAlign: 'left',
         cellComponent: CellComponentToResizeRow
     }]), []);
 
@@ -505,33 +576,10 @@ export function Grid(gridProps: GridProps) {
         return columns.map<Column>((c: Column) => ({
             ...c,
             cellComponent: CellComponentForColumnHeaderBase,
-            cellSpanFunction: props => {
-                let rowSpan = 1;
-                let colSpan = 1;
-
-                function getCellTitle(rowIndex: number, colIndex: number) {
-                    const rowData = props.data[rowIndex];
-                    const column = props.columns[colIndex];
-                    if (rowData && column) {
-                        return rowData[column.field];
-                    }
-                    return '';
-                }
-
-                const cellTitle = getCellTitle(props.rowIndex, props.colIndex);
-                while (rowSpan <= props.lastRowIndexInsideViewPort && cellTitle === getCellTitle(props.rowIndex + rowSpan, props.colIndex)) {
-                    rowSpan++;
-                }
-                while (colSpan <= props.lastColIndexInsideViewPort && cellTitle === getCellTitle(props.rowIndex, props.colIndex + colSpan)) {
-                    colSpan++;
-                }
-                return {
-                    rowSpan,
-                    colSpan
-                }
-            },
+            cellSpanFunction: defaultCellSpanFunction,
         }))
     });
+
 
     const gridContextRef = useRef({
         props: gridProps,
@@ -576,19 +624,21 @@ export function Grid(gridProps: GridProps) {
             columns: $columns.current,
             dataSource: dataProp
         }));
-        setData(clonedData);
+        const filteredData = filterDataSource(clonedData, $gridFilter, $columns.current);
+        setData(filteredData);
     });
 
     return <Vertical style={{height: '100%', width: '100%', overflow: 'auto'}}>
         <GridContext.Provider value={gridContextRef}>
             <Horizontal>
-                <Vertical style={{
-                    flexBasis: FIRST_COLUMN_WIDTH,
-                    flexShrink: 0,
-                    flexGrow: 0,
-                    borderRight: '1px solid #ddd',
-                    borderBottom: '1px solid #ddd'
-                }}/>
+                {rowResizerHidden !== true &&
+                    <Vertical style={{
+                        flexBasis: FIRST_COLUMN_WIDTH,
+                        flexShrink: 0,
+                        flexGrow: 0,
+                        borderRight: '1px solid #ddd',
+                        borderBottom: '1px solid #ddd'
+                    }}/>}
                 {/*HERE IS THE PLACE WHERE WE USE TO PLACE LEFT COLUMN PINNING*/}
                 <Horizontal style={{height: '100%', flexGrow: 1, overflow: 'auto', position: 'relative'}}>
                     <ObserverValue observers={[$pinnedLeftColumnWidth]} render={() => {
@@ -601,13 +651,14 @@ export function Grid(gridProps: GridProps) {
                             zIndex: 1,
                         }}>
                             <Sheet data={headerData}
-                                   columns={columnsHeaderColumn.filter((value, index) => index <= pinnedLeftColumnIndex)}
+                                   columns={columnsHeaderColumn.filter((value, index) => index <= hideLeftColumnIndex)}
                                    $customColWidth={$customColWidth}
                                    styleContainer={{width: '100%'}}
                                    showScroller={false}
-                                   defaultRowHeight={HEADER_HEIGHT}
+                                   defaultRowHeight={defaultHeaderRowHeight || HEADER_HEIGHT}
                                    defaultColWidth={defaultColWidth}
                                    hideLeftColumnIndex={-1}
+                                   rowHeightCallback={headerRowHeightCallback}
                             />
                         </Vertical>
                     }}/>
@@ -619,25 +670,32 @@ export function Grid(gridProps: GridProps) {
                                columns={columnsHeaderColumn}
                                $customColWidth={$customColWidth}
                                showScroller={false}
-                               defaultRowHeight={HEADER_HEIGHT}
+                               defaultRowHeight={defaultHeaderRowHeight || HEADER_HEIGHT}
                                defaultColWidth={defaultColWidth}
-                               hideLeftColumnIndex={pinnedLeftColumnIndex}
+                               hideLeftColumnIndex={hideLeftColumnIndex}
+                               sheetHeightFollowsTotalRowsHeight={true}
+                               rowHeightCallback={headerRowHeightCallback}
                         />
                     </Vertical>
                 </Horizontal>
             </Horizontal>
-            <Horizontal style={{height: `calc(100% - ${HEADER_HEIGHT}px)`, width: '100%', overflow: 'auto'}}>
-                <Vertical style={{flexBasis: FIRST_COLUMN_WIDTH, flexShrink: 0, flexGrow: 0}}>
-                    <Sheet data={sheetDataToResizeRow}
-                           columns={columnDataToResizeRow}
-                           $customRowHeight={$customRowHeight}
-                           ref={gridRowResizerRef}
-                           showScroller={false}
-                           defaultColWidth={FIRST_COLUMN_WIDTH}
-                           defaultRowHeight={defaultRowHeight}
-                           hideLeftColumnIndex={-1}
-                    />
-                </Vertical>
+            <Horizontal style={{
+                height: `calc(100% - ${defaultHeaderRowHeight || HEADER_HEIGHT}px)`,
+                width: '100%',
+                overflow: 'auto'
+            }}>
+                {rowResizerHidden !== true &&
+                    <Vertical style={{flexBasis: FIRST_COLUMN_WIDTH, flexShrink: 0, flexGrow: 0}}>
+                        <Sheet data={sheetDataToResizeRow}
+                               columns={columnDataToResizeRow}
+                               $customRowHeight={$customRowHeight}
+                               ref={gridRowResizerRef}
+                               showScroller={false}
+                               defaultColWidth={FIRST_COLUMN_WIDTH}
+                               defaultRowHeight={defaultRowHeight}
+                               hideLeftColumnIndex={-1}
+                        />
+                    </Vertical>}
                 <Horizontal style={{height: '100%', flexGrow: 1, overflow: 'auto', position: 'relative'}}>
 
                     <ObserverValue observers={[$pinnedLeftColumnWidth, $data, $columns]} render={() => {
@@ -651,7 +709,7 @@ export function Grid(gridProps: GridProps) {
                             zIndex: 1
                         }}>
                             <Sheet ref={gridLeftPinnedRef} data={$data.current}
-                                   columns={$columns.current.filter((value, index) => index <= pinnedLeftColumnIndex)}
+                                   columns={$columns.current.filter((value, index) => index <= hideLeftColumnIndex)}
                                    $customRowHeight={$customRowHeight}
                                    $customColWidth={$customColWidth}
                                    showScroller={false}
@@ -679,9 +737,9 @@ export function Grid(gridProps: GridProps) {
                                           $customRowHeight={$customRowHeight}
                                           $customColWidth={$customColWidth}
                                           onScroll={({scrollLeft, scrollTop}) => {
-                                              gridLeftPinnedRef.current.setScrollerPosition({left:0,top:scrollTop});
-                                              gridRowResizerRef.current.setScrollerPosition({left:0,top:scrollTop});
-                                              gridHeaderRef.current.setScrollerPosition({left:scrollLeft,top:0});
+                                              gridLeftPinnedRef.current.setScrollerPosition({left: 0, top: scrollTop});
+                                              gridRowResizerRef.current.setScrollerPosition({left: 0, top: scrollTop});
+                                              gridHeaderRef.current.setScrollerPosition({left: scrollLeft, top: 0});
                                           }}
                                           defaultColWidth={defaultColWidth}
                                           defaultRowHeight={defaultRowHeight}
@@ -693,7 +751,7 @@ export function Grid(gridProps: GridProps) {
                                               }
                                           }}
                                           $focusedDataItem={$focusedDataItem}
-                                          hideLeftColumnIndex={pinnedLeftColumnIndex}
+                                          hideLeftColumnIndex={hideLeftColumnIndex}
 
                             />
                         }}/>
@@ -705,3 +763,28 @@ export function Grid(gridProps: GridProps) {
     </Vertical>
 }
 
+export function defaultCellSpanFunction(props: CellSpanFunctionProps): CellSpanFunctionResult {
+    let rowSpan = 1;
+    let colSpan = 1;
+
+    function getCellTitle(rowIndex: number, colIndex: number) {
+        const rowData = props.data[rowIndex];
+        const column = props.columns[colIndex];
+        if (rowData && column) {
+            return rowData[column.field];
+        }
+        return '';
+    }
+
+    const cellTitle = getCellTitle(props.rowIndex, props.colIndex);
+    while (rowSpan <= props.lastRowIndexInsideViewPort && cellTitle === getCellTitle(props.rowIndex + rowSpan, props.colIndex)) {
+        rowSpan++;
+    }
+    while (colSpan <= props.lastColIndexInsideViewPort && cellTitle === getCellTitle(props.rowIndex, props.colIndex + colSpan)) {
+        colSpan++;
+    }
+    return {
+        rowSpan,
+        colSpan
+    }
+}
