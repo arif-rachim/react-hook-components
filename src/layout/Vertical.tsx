@@ -4,7 +4,7 @@ import React, {ForwardedRef} from "react";
  * Properties for Vertical props
  */
 interface VerticalProps extends React.HTMLAttributes<HTMLDivElement> {
-    hAlign?: 'left' | 'right' | 'center' | undefined
+    hAlign?: 'left' | 'right' | 'center' | undefined;
     vAlign?: 'top' | 'bottom' | 'center' | undefined
 }
 
