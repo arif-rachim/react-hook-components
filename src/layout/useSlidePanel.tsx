@@ -3,11 +3,13 @@ import {ObserverValue, useObserver} from "react-hook-useobserver";
 import {Observer} from "react-hook-useobserver/lib/useObserver";
 import Vertical from "./Vertical";
 
+
 interface PanelItem {
     panel: JSX.Element,
     onOpenClose: (listener: (isOpen: boolean) => void) => () => void,
     setOpen: (isOpen: boolean) => void,
-    animation : 'UP_DOWN' | 'DOWN_UP' | 'LEFT_RIGHT' | 'RIGHT_LEFT'
+    animation: 'top' | 'bottom' | 'left' | 'right',
+    overlayHidden: boolean
 }
 
 const emptyDiv = document.createElement('div');
@@ -17,28 +19,28 @@ function SlidePanelChild(props: { index: number, $containerDimension: Observer<{
     const [showPanel, setShowPanel] = useState(false);
     const childContainerRef = useRef(emptyDiv);
     const animation = props.panel.animation;
-    const style:any = {};
-    const {height:childHeight,width:childWidth} = childContainerRef.current.getBoundingClientRect();
+    const style: any = {};
+    const {height: childHeight, width: childWidth} = childContainerRef.current.getBoundingClientRect();
 
-    if(animation === "UP_DOWN"){
+    if (animation === "top") {
         style.bottom = props.$containerDimension.current.height - (showPanel ? childHeight : 0);
-        style.left =  0;
+        style.left = 0;
         style.transition = `bottom ${animationDuration}ms ease-in-out`;
         style.justifyContent = 'flex-end';
     }
-    if(animation === "DOWN_UP"){
+    if (animation === "bottom") {
         style.top = props.$containerDimension.current.height - (showPanel ? childHeight : 0);
-        style.left =  0;
+        style.left = 0;
         style.transition = `top ${animationDuration}ms ease-in-out`;
         style.justifyContent = 'flex-start';
     }
-    if(animation === "LEFT_RIGHT"){
+    if (animation === "left") {
         style.top = 0;
         style.left = props.$containerDimension.current.width - (showPanel ? childWidth : 0);
         style.transition = `left ${animationDuration}ms ease-in-out`;
         style.alignItems = 'flex-start';
     }
-    if(animation === "RIGHT_LEFT"){
+    if (animation === "right") {
         style.top = 0;
         style.right = props.$containerDimension.current.width - (showPanel ? childWidth : 0);
         style.transition = `right ${animationDuration}ms ease-in-out`;
@@ -56,15 +58,45 @@ function SlidePanelChild(props: { index: number, $containerDimension: Observer<{
     }, []);
 
     return <Vertical style={{
-
         position: 'absolute',
         boxSizing: 'border-box',
-        overflow: 'auto', ...props.$containerDimension.current,...style
+        overflow: 'auto', ...props.$containerDimension.current, ...style
     }}>
         <Vertical ref={childContainerRef}>
             {props.panel.panel}
         </Vertical>
     </Vertical>;
+}
+
+export type ShowPanelType = (close: (result: any) => void, containerDimension: { width: number, height: number }) => JSX.Element;
+export type ShowPanelCallback = (constructor: ShowPanelType, config?: ConfigType) => Promise<any>;
+export type AnimationType = 'top' | 'bottom' | 'left' | 'right';
+
+export interface ConfigType {
+    animation?: AnimationType,
+    overlayHidden?: boolean
+}
+function OverlayPanel(props:{hasPanel: boolean, $containerDimension:Observer<{width:number,height:number}>}) {
+    const domRef = useRef(emptyDiv);
+    const hasPanel = props.hasPanel;
+
+    useEffect(() => {
+
+        if(hasPanel){
+            domRef.current.style.zIndex = '0';
+        }else{
+            setTimeout(() => {
+                domRef.current.style.zIndex = '-1';
+            },animationDuration)
+        }
+    },[hasPanel]);
+    return <Vertical ref={domRef} style={{
+        backgroundColor: `rgba(0,0,0,${props.hasPanel ? 0.2 : 0})`, ...props.$containerDimension.current,
+        top: 0,
+        left: 0,
+        position: 'absolute',
+        transition: `background-color ${animationDuration - 100}ms ease-in-out`
+    }}/>;
 }
 
 /**
@@ -80,14 +112,16 @@ function SlidePanelChild(props: { index: number, $containerDimension: Observer<{
  *     </SlidePanel>
  * }
  */
-export function useSlidePanel(props:{animation : 'UP_DOWN' | 'DOWN_UP' | 'LEFT_RIGHT' | 'RIGHT_LEFT'}) {
-    const animation = props.animation || 'UP_DOWN';
+export function useSlidePanel(): { showPanel: ShowPanelCallback; SlidePanel: React.FC<React.HTMLAttributes<HTMLDivElement>> } {
+
+
     const [$panels, setPanels] = useObserver<Array<PanelItem>>([]);
     const [$containerDimension, setContainerDimension] = useObserver({width: 0, height: 0});
     const containerRef = useRef(emptyDiv);
     return useMemo(() => {
-        function showPanel(constructor: (close: (result: any) => void, containerDimension: { width: number, height: number }) => JSX.Element) {
+        function showPanel(constructor: ShowPanelType, config: ConfigType = {animation: "top", overlayHidden: false}) {
             return new Promise((resolve) => {
+
                 let panelOpenListeners: Array<(isOpen: boolean) => void> = [];
 
                 function setOpen(isOpen: boolean) {
@@ -103,6 +137,7 @@ export function useSlidePanel(props:{animation : 'UP_DOWN' | 'DOWN_UP' | 'LEFT_R
                     }
                 }
 
+                const {width, height} = containerRef.current.getBoundingClientRect();
                 const Panel = constructor((result: any) => {
                     setOpen(false);
                     setTimeout(() => {
@@ -111,14 +146,16 @@ export function useSlidePanel(props:{animation : 'UP_DOWN' | 'DOWN_UP' | 'LEFT_R
                             return old.filter(p => p.panel !== Panel);
                         })
                     }, animationDuration);
-                }, containerRef.current.getBoundingClientRect());
+                }, {width, height});
 
                 setPanels((old: Array<PanelItem>) => {
+
                     const panelObject: PanelItem = {
                         panel: Panel,
                         onOpenClose,
                         setOpen,
-                        animation
+                        animation: config.animation || 'top',
+                        overlayHidden: config.overlayHidden || false
                     };
                     return [...old, panelObject]
                 })
@@ -131,25 +168,29 @@ export function useSlidePanel(props:{animation : 'UP_DOWN' | 'DOWN_UP' | 'LEFT_R
                 const {width, height} = containerRef.current.getBoundingClientRect();
                 setContainerDimension({width, height});
             }, []);
-
             return <Vertical ref={containerRef} style={{
                 backgroundColor: 'rgba(0,0,0,0.1)',
-                border: '1px solid rgba(0,0,0,0.1)',
                 position: 'relative',
                 overflow: 'hidden',
                 boxSizing: 'border-box',
                 ...style
             }} {...properties}>
                 {props.children}
+
                 <ObserverValue observers={[$panels, $containerDimension]} render={() => {
+                    const hasPanel = $panels.current.length > 0;
+                    const lastPanel = $panels.current[$panels.current.length-1];
+                    const overlayHidden = lastPanel?.overlayHidden;
                     return <>
+                        {!overlayHidden &&
+                        <OverlayPanel hasPanel={hasPanel} $containerDimension={$containerDimension} />
+                        }
                         {$panels.current.map((panel, index) => {
                             return <SlidePanelChild key={index} index={index} $containerDimension={$containerDimension}
                                                     panel={panel}/>
                         })}
                     </>
                 }}/>
-
             </Vertical>;
         }
 

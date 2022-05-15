@@ -10,6 +10,7 @@ export interface GridProps {
     onFocusedDataItemChange?: (newItem: any, oldItem: any) => void;
     pinnedLeftColumnIndex?: number;
     rowResizerHidden?: boolean;
+    headerHidden?: boolean;
     filterHidden?: boolean;
     sortableHidden?: boolean;
     defaultHeaderRowHeight?: number;

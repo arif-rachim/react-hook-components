@@ -12,7 +12,8 @@ import React, {
     createContext,
     FC,
     MouseEvent as ReactMouseEvent,
-    MutableRefObject, ReactElement,
+    MutableRefObject,
+    ReactElement,
     useCallback,
     useContext,
     useEffect,
@@ -22,7 +23,8 @@ import React, {
 import {IoArrowDown, IoArrowUp} from "react-icons/io5";
 import Vertical from "../layout/Vertical";
 import Horizontal from "../layout/Horizontal";
-import {Observer, useObserver,ObserverValue,useObserverListener,useObserverValue} from "react-hook-useobserver";
+import {ObserverValue, useObserver, useObserverListener, useObserverValue} from "react-hook-useobserver";
+import {Observer} from "react-hook-useobserver/lib/useObserver";
 
 export interface GridProps {
     data: Array<any>,
@@ -34,24 +36,25 @@ export interface GridProps {
     onFocusedDataItemChange?: (newItem: any, oldItem: any) => void,
     pinnedLeftColumnIndex?: number,
     rowResizerHidden?: boolean,
+    headerHidden?: boolean,
     filterHidden?: boolean,
     sortableHidden?: boolean,
     defaultHeaderRowHeight?: number,
     headerRowHeightCallback?: CalculateLengthCallback,
     customRowHeight?: Map<number, number>,
     customColWidth?: Map<number, number>,
-    onCustomColWidthChange?:(customColWidth:Map<number,number>) => void,
-    onCustomRowHeightChange?:(customRowHeight:Map<number,number>) => void
+    onCustomColWidthChange?: (customColWidth: Map<number, number>) => void,
+    onCustomRowHeightChange?: (customRowHeight: Map<number, number>) => void
 }
 
 export interface GridColumn extends Column {
-    title: string|JSX.Element,
+    title: string | JSX.Element,
     headerCellComponent?: React.FC<HeaderCellComponentProps>,
     filterCellComponent?: React.FC<HeaderCellComponentProps>
 }
 
 export interface GridColumnGroup {
-    title: string|JSX.Element,
+    title: string | JSX.Element,
     columns: Array<GridColumnGroup | GridColumn>
 }
 
@@ -72,7 +75,7 @@ const CellComponentForColumnHeaderBase: FC<CellComponentProps> = (props) => {
     const gridColumn: GridColumn = column;
     const CellComponentForColHeader = gridColumn.headerCellComponent || CellComponentForColumnHeader;
     const mousePositionRef = useRef({current: 0, next: 0, dragActive: false});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line
     const handleDrag = useCallback(dragListener(mousePositionRef, gridContextRef.current.onCellResize, index, containerRef, handlerRef, "horizontal"), []);
     useEffect(() => {
         handlerRef.current.style.left = `${containerRef.current.getBoundingClientRect().width - Math.ceil(0.5 * HANDLER_LENGTH)}px`;
@@ -116,7 +119,7 @@ const CellComponentToResizeRow: React.FC<CellComponentProps> = (props: CellCompo
 
     const gridContextRef = useContext(GridContext);
     const mousePositionRef = useRef({current: 0, next: 0, dragActive: false});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line
     const handleDrag = useCallback(dragListener(mousePositionRef, gridContextRef.current.onRowResize, index, containerRef, handlerBottomRef, "vertical"), []);
     useEffect(() => {
         handlerBottomRef.current.style.top = `${containerRef.current.getBoundingClientRect().height - Math.ceil(0.5 * HANDLER_LENGTH)}px`;
@@ -409,7 +412,7 @@ function populateHeaderDataMap(columnsProp: Array<GridColumnGroup | GridColumn>,
         if (!headerDataMap.has(rowIdx)) {
             headerDataMap.set(rowIdx, new Map<string, string>());
         }
-        const row: Map<string, string|ReactElement> = (headerDataMap.get(rowIdx) || new Map<string, ReactElement>());
+        const row: Map<string, string | ReactElement> = (headerDataMap.get(rowIdx) || new Map<string, ReactElement>());
 
         if ('columns' in column) {
             populateHeaderDataMap(column.columns, headerDataMap, rowIdx + 1, (field: string) => {
@@ -464,6 +467,7 @@ export function Grid(gridProps: GridProps) {
         defaultColWidth: _defaultCoWidth,
         pinnedLeftColumnIndex,
         rowResizerHidden,
+        headerHidden,
         defaultHeaderRowHeight,
         headerRowHeightCallback,
         customRowHeight,
@@ -481,15 +485,17 @@ export function Grid(gridProps: GridProps) {
     const [$customColWidth, setCustomColWidth] = useObserver(customColWidth || new Map<number, number>());
     const [$customRowHeight, setCustomRowHeight] = useObserver(customRowHeight || new Map<number, number>());
 
-    useObserverListener($customColWidth,() => {
-        const changeCallback = onCustomColWidthChange || (() => {});
-        if($customColWidth.current.size > 0){
+    useObserverListener($customColWidth, () => {
+        const changeCallback = onCustomColWidthChange || (() => {
+        });
+        if ($customColWidth.current.size > 0) {
             changeCallback($customColWidth.current);
         }
     });
-    useObserverListener($customRowHeight,() => {
-        const changeCallback = onCustomRowHeightChange || (() => {});
-        if($customRowHeight.current.size > 0){
+    useObserverListener($customRowHeight, () => {
+        const changeCallback = onCustomRowHeightChange || (() => {
+        });
+        if ($customRowHeight.current.size > 0) {
             changeCallback($customRowHeight.current);
         }
 
@@ -519,22 +525,20 @@ export function Grid(gridProps: GridProps) {
     useObserverListener([$viewPortDimension, $columns], () => {
         if ($viewPortDimension.current.width > 0) {
             const propsCustomColWidth = gridProps.customColWidth || new Map<number, number>();
-
-
             const columnsWidth = new Map<number, number>();
             const columnsWidthPercentage = new Map<number, number>();
             let totalColumnsWidth = 0;
             let totalPercentage = 0;
             const viewPortWidth = $viewPortDimension.current.width - SCROLLER_WIDTH;
             $columns.current.forEach((column, columnIndex) => {
-                if(propsCustomColWidth.has(columnIndex)){
-                    const width = propsCustomColWidth.get(columnIndex) || 0
+                if (propsCustomColWidth.has(columnIndex)) {
+                    const width = propsCustomColWidth.get(columnIndex) || 0;
                     totalColumnsWidth += width;
                     columnsWidth.set(columnIndex, width);
-                }else if (typeof column.width === 'number') {
+                } else if (typeof column.width === 'number') {
                     totalColumnsWidth += column.width;
                     columnsWidth.set(columnIndex, column.width);
-                }else if (typeof column.width === 'string' && column.width.endsWith('%')) {
+                } else if (typeof column.width === 'string' && column.width.endsWith('%')) {
                     const widthInPercentage = parseInt(column.width.replace('%', ''));
                     columnsWidthPercentage.set(columnIndex, widthInPercentage);
                     totalPercentage += widthInPercentage;
@@ -560,7 +564,7 @@ export function Grid(gridProps: GridProps) {
         setPinnedLeftColumnWidth(pinnedLeftColWidth);
     });
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line
     const headerData: Array<any> = useMemo(constructHeaderData(columnsProp), [columnsProp]);
     useEffect(() => setData(dataProp), [dataProp, setData]);
     useEffect(() => setColumns(convertColumnsPropsToColumns(columnsProp)), [columnsProp, setColumns]);
@@ -630,57 +634,59 @@ export function Grid(gridProps: GridProps) {
 
     return <Vertical style={{height: '100%', width: '100%', overflow: 'auto'}}>
         <GridContext.Provider value={gridContextRef}>
-            <Horizontal>
-                {rowResizerHidden !== true &&
-                    <Vertical style={{
-                        flexBasis: FIRST_COLUMN_WIDTH,
-                        flexShrink: 0,
-                        flexGrow: 0,
-                        borderRight: '1px solid #ddd',
-                        borderBottom: '1px solid #ddd'
-                    }}/>}
-                {/*HERE IS THE PLACE WHERE WE USE TO PLACE LEFT COLUMN PINNING*/}
-                <Horizontal style={{height: '100%', flexGrow: 1, overflow: 'auto', position: 'relative'}}>
-                    <ObserverValue observers={[$pinnedLeftColumnWidth]} render={() => {
-                        return <Vertical style={{
-                            width: $pinnedLeftColumnWidth.current,
-                            overflow: 'auto',
+            {headerHidden !== true &&
+                <Horizontal>
+                    {rowResizerHidden !== true &&
+                        <Vertical style={{
+                            flexBasis: FIRST_COLUMN_WIDTH,
                             flexShrink: 0,
                             flexGrow: 0,
-                            position: 'absolute',
-                            zIndex: 1,
-                        }}>
+                            borderRight: '1px solid #ddd',
+                            borderBottom: '1px solid #ddd'
+                        }}/>}
+                    {/*HERE IS THE PLACE WHERE WE USE TO PLACE LEFT COLUMN PINNING*/}
+                    <Horizontal style={{height: '100%', flexGrow: 1, overflow: 'auto', position: 'relative'}}>
+                        <ObserverValue observers={[$pinnedLeftColumnWidth]} render={() => {
+                            return <Vertical style={{
+                                width: $pinnedLeftColumnWidth.current,
+                                overflow: 'auto',
+                                flexShrink: 0,
+                                flexGrow: 0,
+                                position: 'absolute',
+                                zIndex: 1,
+                            }}>
+                                <Sheet data={headerData}
+                                       columns={columnsHeaderColumn.filter((value, index) => index <= hideLeftColumnIndex)}
+                                       $customColWidth={$customColWidth}
+                                       styleContainer={{width: '100%'}}
+                                       showScroller={false}
+                                       defaultRowHeight={defaultHeaderRowHeight || HEADER_HEIGHT}
+                                       defaultColWidth={defaultColWidth}
+                                       hideLeftColumnIndex={-1}
+                                       rowHeightCallback={headerRowHeightCallback}
+                                />
+                            </Vertical>
+                        }}/>
+
+                        {/*END OF THE PLACE WHERE WE USE TO PLACE LEFT COLUMN PINNING*/}
+                        <Vertical style={{flexGrow: 1, overflow: 'auto'}}>
                             <Sheet data={headerData}
-                                   columns={columnsHeaderColumn.filter((value, index) => index <= hideLeftColumnIndex)}
+                                   ref={gridHeaderRef}
+                                   columns={columnsHeaderColumn}
                                    $customColWidth={$customColWidth}
-                                   styleContainer={{width: '100%'}}
                                    showScroller={false}
                                    defaultRowHeight={defaultHeaderRowHeight || HEADER_HEIGHT}
                                    defaultColWidth={defaultColWidth}
-                                   hideLeftColumnIndex={-1}
+                                   hideLeftColumnIndex={hideLeftColumnIndex}
+                                   sheetHeightFollowsTotalRowsHeight={true}
                                    rowHeightCallback={headerRowHeightCallback}
                             />
                         </Vertical>
-                    }}/>
-
-                    {/*END OF THE PLACE WHERE WE USE TO PLACE LEFT COLUMN PINNING*/}
-                    <Vertical style={{flexGrow: 1, overflow: 'auto'}}>
-                        <Sheet data={headerData}
-                               ref={gridHeaderRef}
-                               columns={columnsHeaderColumn}
-                               $customColWidth={$customColWidth}
-                               showScroller={false}
-                               defaultRowHeight={defaultHeaderRowHeight || HEADER_HEIGHT}
-                               defaultColWidth={defaultColWidth}
-                               hideLeftColumnIndex={hideLeftColumnIndex}
-                               sheetHeightFollowsTotalRowsHeight={true}
-                               rowHeightCallback={headerRowHeightCallback}
-                        />
-                    </Vertical>
+                    </Horizontal>
                 </Horizontal>
-            </Horizontal>
+            }
             <Horizontal style={{
-                height: `calc(100% - ${defaultHeaderRowHeight || HEADER_HEIGHT}px)`,
+                height: `calc(100% - ${headerHidden === true ? 0 : (defaultHeaderRowHeight || HEADER_HEIGHT)}px)`,
                 width: '100%',
                 overflow: 'auto'
             }}>

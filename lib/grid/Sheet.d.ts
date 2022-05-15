@@ -1,5 +1,5 @@
 import React, { CSSProperties, SyntheticEvent } from "react";
-import { Observer } from "react-hook-useobserver";
+import { Observer } from "react-hook-useobserver/lib/useObserver";
 export interface CellSpanFunctionProps {
     lastRowIndexBeforeViewPort: number;
     lastRowIndexInsideViewPort: number;
