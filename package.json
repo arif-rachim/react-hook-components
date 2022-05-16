@@ -40,6 +40,8 @@
     "wait-for-expect": "^3.0.2"
   },
   "dependencies": {
+    "@types/cleave.js": "^1.4.6",
+    "cleave.js": "^1.6.0",
     "react-hook-useobserver": "^1.0.0-alpha.16",
     "react-icons": "^4.3.1"
   }
