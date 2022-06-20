@@ -4,15 +4,15 @@
     "target": "ES2015",
     "jsx": "react",
     "declaration": true,
-    "outDir": "lib",
-    "moduleResolution": "Node",
+    "outDir": "./dist",
+    "module": "CommonJS",
     "allowSyntheticDefaultImports": true
   },
   "include": [
-    "src"
+    "src/**/*"
   ],
   "exclude": [
     "src/**/*.test.tsx",
-    "src/setupEnzyme"
+    "src/setupEnzyme.ts"
   ]
 }

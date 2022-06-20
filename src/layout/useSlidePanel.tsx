@@ -171,6 +171,7 @@ export function useSlidePanel(): { showPanel: ShowPanelCallback; SlidePanel: Rea
             }, []);
             return <Vertical ref={containerRef} overflow={"hidden"}
                              position={"relative"}
+
                              backgroundColor={'rgba(0,0,0,0.1)'}
                              style={style} {...properties}>
                 {props.children}

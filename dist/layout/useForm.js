@@ -1,3 +1,4 @@
+"use strict";
 var __rest = (this && this.__rest) || function (s, e) {
     var t = {};
     for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
@@ -9,28 +10,30 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-import React, { createContext, useContext, useEffect, useMemo, useRef } from "react";
-import { emptyObserver, emptySetObserver, useObserver, useObserverValue } from "react-hook-useobserver/lib";
-import Cleave from "cleave.js/react";
-export const FormContext = createContext({
-    $state: emptyObserver,
-    $errors: emptyObserver,
-    $modified: emptyObserver,
-    $touched: emptyObserver,
-    setErrors: emptySetObserver,
-    setModified: emptySetObserver,
-    setState: emptySetObserver,
-    setTouched: emptySetObserver,
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Input = exports.useForm = exports.FormContext = void 0;
+const react_1 = require("react");
+const lib_1 = require("react-hook-useobserver/lib");
+const react_2 = require("cleave.js/react");
+exports.FormContext = (0, react_1.createContext)({
+    $state: lib_1.emptyObserver,
+    $errors: lib_1.emptyObserver,
+    $modified: lib_1.emptyObserver,
+    $touched: lib_1.emptyObserver,
+    setErrors: lib_1.emptySetObserver,
+    setModified: lib_1.emptySetObserver,
+    setState: lib_1.emptySetObserver,
+    setTouched: lib_1.emptySetObserver,
     addValidator: () => () => {
     }
 });
-export function useForm(initialState) {
-    const [$state, setState] = useObserver(initialState);
-    const [$errors, setErrors] = useObserver(new Map());
-    const [$touched, setTouched] = useObserver([]);
-    const [$modified, setModified] = useObserver([]);
-    const [$validators, setValidators] = useObserver([]);
-    return useMemo(() => {
+function useForm(initialState) {
+    const [$state, setState] = (0, lib_1.useObserver)(initialState);
+    const [$errors, setErrors] = (0, lib_1.useObserver)(new Map());
+    const [$touched, setTouched] = (0, lib_1.useObserver)([]);
+    const [$modified, setModified] = (0, lib_1.useObserver)([]);
+    const [$validators, setValidators] = (0, lib_1.useObserver)([]);
+    return (0, react_1.useMemo)(() => {
         function addValidator(validator) {
             setValidators(old => [...old, validator]);
             return function removeValidator() {
@@ -42,7 +45,7 @@ export function useForm(initialState) {
             return $errors.current.size === 0;
         }
         function Form(props) {
-            return React.createElement(FormContext.Provider, { value: {
+            return react_1.default.createElement(exports.FormContext.Provider, { value: {
                     $state,
                     setState,
                     $errors,
@@ -57,6 +60,7 @@ export function useForm(initialState) {
         return { Form, $errors, $touched, $modified, $state, validateForm };
     }, []);
 }
+exports.useForm = useForm;
 function doNothing(val) {
     return val;
 }
@@ -73,15 +77,15 @@ function toggleState(flag, setState, field) {
     });
 }
 const defaultValidator = props => [];
-export function Input(props) {
-    const context = useContext(FormContext);
+function Input(props) {
+    const context = (0, react_1.useContext)(exports.FormContext);
     let { valueMapper, valueConverter, validator } = props, properties = __rest(props, ["valueMapper", "valueConverter", "validator"]);
     valueMapper = valueMapper || doNothing;
     valueConverter = valueConverter || doNothing;
     validator = validator || defaultValidator;
-    const propsRef = useRef({ valueMapper, valueConverter, validator });
+    const propsRef = (0, react_1.useRef)({ valueMapper, valueConverter, validator });
     propsRef.current = { valueMapper, valueConverter, validator };
-    const rawValue = useObserverValue(context.$state, arg => {
+    const rawValue = (0, lib_1.useObserverValue)(context.$state, arg => {
         const state = context.$state.current || {};
         return state[props.field];
     });
@@ -92,7 +96,7 @@ export function Input(props) {
     function setTouched(flag) {
         toggleState(flag, context.setTouched, props.field);
     }
-    useEffect(() => {
+    (0, react_1.useEffect)(() => {
         function validateField() {
             const { valueMapper, validator } = propsRef.current;
             const rawValue = context.$state.current[props.field];
@@ -136,7 +140,7 @@ export function Input(props) {
             return Object.assign(Object.assign({}, oldVal), { [props.field]: value });
         });
     }
-    return React.createElement(Cleave, Object.assign({}, properties, { options: props.options, value: stringValue, onChange: (e) => {
+    return react_1.default.createElement(react_2.default, Object.assign({}, properties, { options: props.options, value: stringValue, onChange: (e) => {
             const formStateFieldValue = e.target.value;
             const formStateFieldMappedValue = propsRef.current.valueMapper(formStateFieldValue);
             setModified(true);
@@ -153,4 +157,5 @@ export function Input(props) {
             setValue(e.target.value);
         }, style: props.style }));
 }
+exports.Input = Input;
 //# sourceMappingURL=useForm.js.map

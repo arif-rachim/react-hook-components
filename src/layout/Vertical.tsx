@@ -9,7 +9,7 @@ import {LayoutProps, useLayoutPropsValue} from "./LayoutProps";
  * 3. box-sizing : border-box.
  * Vertical also has vAlign and hAlign attributes, which can be used to adjust the alignment position of its children.
  */
-export const Vertical = React.forwardRef(function Vertical(props: LayoutProps, ref: ForwardedRef<HTMLDivElement>): JSX.Element {
+export const Vertical = React.forwardRef((props:LayoutProps,ref:ForwardedRef<HTMLDivElement>) => {
     const {style,properties} = useLayoutPropsValue(props,false);
     return <div ref={ref} style={style} {...properties}>{properties.children}</div>
 });

@@ -1,13 +1,16 @@
-import React, { createContext, useCallback, useContext, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-import { useObserver, useObserverListener } from "react-hook-useobserver";
-import { Vertical } from "../layout/Vertical";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.dataItemToValueDefaultImplementation = exports.Sheet = void 0;
+const react_1 = require("react");
+const react_hook_useobserver_1 = require("react-hook-useobserver");
+const Vertical_1 = require("../layout/Vertical");
 const BORDER = '1px solid rgba(0,0,0,0.1)';
 function cellSpanFunctionDefaultImplementation() {
     return { colSpan: 1, rowSpan: 1 };
 }
 const defaultDom = document.createElement('div');
 const CellComponentDefaultImplementation = (props) => {
-    return React.createElement(Vertical, { style: props.cellStyle, vAlign: 'center' }, props.value);
+    return react_1.default.createElement(Vertical_1.Vertical, { style: props.cellStyle, vAlign: 'center' }, props.value);
 };
 function cellStyleFunctionDefaultImplementation(props) {
     const isFocused = props.isFocused;
@@ -19,25 +22,25 @@ function cellStyleFunctionDefaultImplementation(props) {
         textAlign: props.column.hAlign
     };
 }
-const SheetContext = createContext({ current: { props: undefined } });
+const SheetContext = (0, react_1.createContext)({ current: { props: undefined } });
 const defaultLengthCallback = props => props.length;
-export const Sheet = React.forwardRef(function Sheet(props, ref) {
-    const propsRef = useRef(props);
+exports.Sheet = react_1.default.forwardRef(function Sheet(props, ref) {
+    const propsRef = (0, react_1.useRef)(props);
     propsRef.current = props;
     const { sheetHeightFollowsTotalRowsHeight } = props;
-    const sheetContextRef = useRef({ props });
+    const sheetContextRef = (0, react_1.useRef)({ props });
     sheetContextRef.current = { props };
-    const [$reRender, setReRender] = useObserver(new Date());
+    const [$reRender, setReRender] = (0, react_hook_useobserver_1.useObserver)(new Date());
     const { $customColWidth, $customRowHeight } = props;
-    const [$defaultRowHeight,] = useObserver(props.defaultRowHeight);
-    const [$defaultColWidth,] = useObserver(props.defaultColWidth);
-    const [$viewPortDimension, setViewPortDimension] = useObserver({ width: 0, height: 0 });
-    const [$scrollerPosition, setScrollerPosition] = useObserver({ left: 0, top: 0 });
-    const [$emptyMapObserver] = useObserver(new Map());
-    const [elements, setElements] = useState(new Array());
-    const forceUpdate = useCallback(() => setReRender(new Date()), [setReRender]);
-    useEffect(forceUpdate, [props.data, props.columns, forceUpdate]);
-    useImperativeHandle(ref, () => {
+    const [$defaultRowHeight,] = (0, react_hook_useobserver_1.useObserver)(props.defaultRowHeight);
+    const [$defaultColWidth,] = (0, react_hook_useobserver_1.useObserver)(props.defaultColWidth);
+    const [$viewPortDimension, setViewPortDimension] = (0, react_hook_useobserver_1.useObserver)({ width: 0, height: 0 });
+    const [$scrollerPosition, setScrollerPosition] = (0, react_hook_useobserver_1.useObserver)({ left: 0, top: 0 });
+    const [$emptyMapObserver] = (0, react_hook_useobserver_1.useObserver)(new Map());
+    const [elements, setElements] = (0, react_1.useState)(new Array());
+    const forceUpdate = (0, react_1.useCallback)(() => setReRender(new Date()), [setReRender]);
+    (0, react_1.useEffect)(forceUpdate, [props.data, props.columns, forceUpdate]);
+    (0, react_1.useImperativeHandle)(ref, () => {
         function updateScrollerPosition(scrollerPosition) {
             viewPortRef.current.scrollLeft = scrollerPosition.left;
             viewPortRef.current.scrollTop = scrollerPosition.top;
@@ -47,18 +50,18 @@ export const Sheet = React.forwardRef(function Sheet(props, ref) {
             setScrollerPosition: updateScrollerPosition
         };
     }, [setScrollerPosition]);
-    const [$totalWidthOfContent, setTotalWidthOfContent] = useObserver(calculateLength($customColWidth === null || $customColWidth === void 0 ? void 0 : $customColWidth.current, propsRef.current.columns, $defaultColWidth.current, propsRef.current.colWidthCallback));
-    useObserverListener($customColWidth || $emptyMapObserver, () => setTotalWidthOfContent(calculateLength($customColWidth === null || $customColWidth === void 0 ? void 0 : $customColWidth.current, propsRef.current.columns, $defaultColWidth.current, propsRef.current.colWidthCallback)));
-    const [$totalHeightOfContent, setTotalHeightOfContent] = useObserver(calculateLength($customRowHeight === null || $customRowHeight === void 0 ? void 0 : $customRowHeight.current, propsRef.current.data, $defaultRowHeight.current, propsRef.current.rowHeightCallback));
-    useObserverListener($customRowHeight || $emptyMapObserver, () => setTotalHeightOfContent(calculateLength($customRowHeight === null || $customRowHeight === void 0 ? void 0 : $customRowHeight.current, propsRef.current.data, $defaultRowHeight.current, propsRef.current.rowHeightCallback)));
-    useEffect(() => setTotalHeightOfContent(calculateLength($customRowHeight === null || $customRowHeight === void 0 ? void 0 : $customRowHeight.current, props.data, $defaultRowHeight.current, propsRef.current.rowHeightCallback)), [props.data, $customRowHeight, $defaultRowHeight, setTotalHeightOfContent]);
-    const viewPortRef = useRef(defaultDom);
-    useEffect(() => {
+    const [$totalWidthOfContent, setTotalWidthOfContent] = (0, react_hook_useobserver_1.useObserver)(calculateLength($customColWidth === null || $customColWidth === void 0 ? void 0 : $customColWidth.current, propsRef.current.columns, $defaultColWidth.current, propsRef.current.colWidthCallback));
+    (0, react_hook_useobserver_1.useObserverListener)($customColWidth || $emptyMapObserver, () => setTotalWidthOfContent(calculateLength($customColWidth === null || $customColWidth === void 0 ? void 0 : $customColWidth.current, propsRef.current.columns, $defaultColWidth.current, propsRef.current.colWidthCallback)));
+    const [$totalHeightOfContent, setTotalHeightOfContent] = (0, react_hook_useobserver_1.useObserver)(calculateLength($customRowHeight === null || $customRowHeight === void 0 ? void 0 : $customRowHeight.current, propsRef.current.data, $defaultRowHeight.current, propsRef.current.rowHeightCallback));
+    (0, react_hook_useobserver_1.useObserverListener)($customRowHeight || $emptyMapObserver, () => setTotalHeightOfContent(calculateLength($customRowHeight === null || $customRowHeight === void 0 ? void 0 : $customRowHeight.current, propsRef.current.data, $defaultRowHeight.current, propsRef.current.rowHeightCallback)));
+    (0, react_1.useEffect)(() => setTotalHeightOfContent(calculateLength($customRowHeight === null || $customRowHeight === void 0 ? void 0 : $customRowHeight.current, props.data, $defaultRowHeight.current, propsRef.current.rowHeightCallback)), [props.data, $customRowHeight, $defaultRowHeight, setTotalHeightOfContent]);
+    const viewPortRef = (0, react_1.useRef)(defaultDom);
+    (0, react_1.useEffect)(() => {
         const viewPortDom = viewPortRef.current;
         let { offsetWidth, offsetHeight } = viewPortDom;
         setViewPortDimension({ width: offsetWidth, height: offsetHeight });
     }, [props.styleContainer, setViewPortDimension]);
-    const totalRowsHeight = useMemo(() => {
+    const totalRowsHeight = (0, react_1.useMemo)(() => {
         const customRowHeight = (($customRowHeight === null || $customRowHeight === void 0 ? void 0 : $customRowHeight.current) || new Map());
         const defaultRowHeight = $defaultRowHeight.current;
         if (sheetHeightFollowsTotalRowsHeight) {
@@ -77,7 +80,7 @@ export const Sheet = React.forwardRef(function Sheet(props, ref) {
         }
         return $viewPortDimension.current.height;
     }, [$customRowHeight, $defaultRowHeight, $viewPortDimension, props.data, sheetHeightFollowsTotalRowsHeight]);
-    useObserverListener([$reRender, $viewPortDimension, $scrollerPosition, $defaultRowHeight, $defaultColWidth, $customRowHeight || $emptyMapObserver, $customColWidth || $emptyMapObserver], () => {
+    (0, react_hook_useobserver_1.useObserverListener)([$reRender, $viewPortDimension, $scrollerPosition, $defaultRowHeight, $defaultColWidth, $customRowHeight || $emptyMapObserver, $customColWidth || $emptyMapObserver], () => {
         const scrollerPosition = $scrollerPosition.current;
         renderComponent({
             setElements,
@@ -96,7 +99,7 @@ export const Sheet = React.forwardRef(function Sheet(props, ref) {
             rowHeightCallback: propsRef.current.rowHeightCallback
         });
     });
-    const handleScroller = useCallback(function handleScroller() {
+    const handleScroller = (0, react_1.useCallback)(function handleScroller() {
         const viewPortDom = viewPortRef.current;
         if (propsRef.current.onScroll)
             propsRef.current.onScroll({
@@ -105,15 +108,15 @@ export const Sheet = React.forwardRef(function Sheet(props, ref) {
             });
         setScrollerPosition({ left: viewPortDom.scrollLeft, top: viewPortDom.scrollTop });
     }, [setScrollerPosition]);
-    return React.createElement(SheetContext.Provider, { value: sheetContextRef },
-        React.createElement("div", { ref: viewPortRef, style: {
+    return react_1.default.createElement(SheetContext.Provider, { value: sheetContextRef },
+        react_1.default.createElement("div", { ref: viewPortRef, style: {
                 width: '100%',
                 height: '100%',
                 overflow: propsRef.current.showScroller === false ? 'hidden' : 'auto',
                 boxSizing: 'border-box',
                 backgroundColor: '#fefefe',
             }, onScroll: handleScroller },
-            React.createElement("div", { style: Object.assign({ width: $totalWidthOfContent.current, height: $totalHeightOfContent.current, boxSizing: 'border-box', position: 'relative' }, propsRef.current.styleViewPort) }, elements)));
+            react_1.default.createElement("div", { style: Object.assign({ width: $totalWidthOfContent.current, height: $totalHeightOfContent.current, boxSizing: 'border-box', position: 'relative' }, propsRef.current.styleViewPort) }, elements)));
 });
 function calculateBeforeViewPort(columns, customLength = new Map(), defaultLength = 50, scrollerPosition = 0, calcLengthCallback = defaultLengthCallback) {
     return columns.reduce((acc, _, index) => {
@@ -165,17 +168,17 @@ function calculateLength(customLength = new Map(), data, defaultLength = 0, calc
     }, 0);
     return totalDefaultLength + totalCustomLength;
 }
-const CellRenderer = React.memo(function CellRenderer(props) {
+const CellRenderer = react_1.default.memo(function CellRenderer(props) {
     var _a, _b, _c;
-    const sheetContext = useContext(SheetContext);
+    const sheetContext = (0, react_1.useContext)(SheetContext);
     const cellStyleFunction = props.column.cellStyleFunction || cellStyleFunctionDefaultImplementation;
-    const [$emptyObserver] = useObserver(undefined);
-    const [isFocused, setIsFocused] = useState(() => {
+    const [$emptyObserver] = (0, react_hook_useobserver_1.useObserver)(undefined);
+    const [isFocused, setIsFocused] = (0, react_1.useState)(() => {
         var _a, _b;
         return props.dataItem === ((_b = (_a = sheetContext.current.props) === null || _a === void 0 ? void 0 : _a.$focusedDataItem) === null || _b === void 0 ? void 0 : _b.current);
     });
-    useEffect(() => { var _a, _b; return setIsFocused(props.dataItem === ((_b = (_a = sheetContext.current.props) === null || _a === void 0 ? void 0 : _a.$focusedDataItem) === null || _b === void 0 ? void 0 : _b.current)); }, [props.dataItem, sheetContext]);
-    useObserverListener(((_a = sheetContext.current.props) === null || _a === void 0 ? void 0 : _a.$focusedDataItem) || $emptyObserver, () => {
+    (0, react_1.useEffect)(() => { var _a, _b; return setIsFocused(props.dataItem === ((_b = (_a = sheetContext.current.props) === null || _a === void 0 ? void 0 : _a.$focusedDataItem) === null || _b === void 0 ? void 0 : _b.current)); }, [props.dataItem, sheetContext]);
+    (0, react_hook_useobserver_1.useObserverListener)(((_a = sheetContext.current.props) === null || _a === void 0 ? void 0 : _a.$focusedDataItem) || $emptyObserver, () => {
         var _a, _b;
         const focusedItem = (_b = (_a = sheetContext.current.props) === null || _a === void 0 ? void 0 : _a.$focusedDataItem) === null || _b === void 0 ? void 0 : _b.current;
         const isFocused = focusedItem === props.dataItem;
@@ -184,7 +187,7 @@ const CellRenderer = React.memo(function CellRenderer(props) {
     const focusedItem = (_c = (_b = sheetContext.current.props) === null || _b === void 0 ? void 0 : _b.$focusedDataItem) === null || _c === void 0 ? void 0 : _c.current;
     const cellStyle = cellStyleFunction(Object.assign({ isFocused, focusedItem }, props));
     const CellComponent = props.column.cellComponent || CellComponentDefaultImplementation;
-    return React.createElement("div", { style: Object.assign({ position: 'absolute', height: props.height, width: props.width, top: props.top, left: props.left, borderBottom: BORDER, borderRight: BORDER, boxSizing: 'border-box', overflow: 'visible', display: 'flex', flexDirection: 'column' }, props.style), onClick: (event) => {
+    return react_1.default.createElement("div", { style: Object.assign({ position: 'absolute', height: props.height, width: props.width, top: props.top, left: props.left, borderBottom: BORDER, borderRight: BORDER, boxSizing: 'border-box', overflow: 'visible', display: 'flex', flexDirection: 'column' }, props.style), onClick: (event) => {
             var _a, _b;
             if ((_b = (_a = sheetContext.current) === null || _a === void 0 ? void 0 : _a.props) === null || _b === void 0 ? void 0 : _b.onCellClicked) {
                 sheetContext.current.props.onCellClicked({
@@ -237,7 +240,7 @@ const CellRenderer = React.memo(function CellRenderer(props) {
                 });
             }
         } },
-        React.createElement(CellComponent, { value: props.value, column: props.column, dataItem: props.dataItem, dataSource: props.dataSource, rowIndex: props.rowIndex, colIndex: props.colIndex, cellStyle: cellStyle, rowSpan: props.rowSpan, colSpan: props.colSpan }));
+        react_1.default.createElement(CellComponent, { value: props.value, column: props.column, dataItem: props.dataItem, dataSource: props.dataSource, rowIndex: props.rowIndex, colIndex: props.colIndex, cellStyle: cellStyle, rowSpan: props.rowSpan, colSpan: props.colSpan }));
 });
 function calculateCellToBeSkippedDuringRendering(param) {
     const { lastColIndexBeforeViewPort, data, lastRowIndexBeforeViewPort, columns, lastRowIndexInsideViewPort, lastColIndexInsideViewPort } = param;
@@ -358,7 +361,7 @@ function renderComponent({ setElements, data, columns, hideLeftColumnIndex, cust
                 }, 0);
             }
             if (colIndex > hideLeftColumnIndex) {
-                colAcc.elements.push(React.createElement(CellRenderer, { key: `${rowIndex}-${colIndex}`, rowIndex: rowIndex, colIndex: colIndex, top: acc.top, width: accumulatedColWidth, dataSource: data, dataItem: dataItem, value: value, column: column, left: colAcc.left, height: accumulatedRowHeight, colSpan: colSpan, rowSpan: rowSpan }));
+                colAcc.elements.push(react_1.default.createElement(CellRenderer, { key: `${rowIndex}-${colIndex}`, rowIndex: rowIndex, colIndex: colIndex, top: acc.top, width: accumulatedColWidth, dataSource: data, dataItem: dataItem, value: value, column: column, left: colAcc.left, height: accumulatedRowHeight, colSpan: colSpan, rowSpan: rowSpan }));
             }
             colAcc.left = colAcc.left + colWidth;
             return colAcc;
@@ -369,11 +372,12 @@ function renderComponent({ setElements, data, columns, hideLeftColumnIndex, cust
     }, { elements: [], top: totalHeightBeforeViewPort });
     setElements(elements);
 }
-export function dataItemToValueDefaultImplementation(props) {
+function dataItemToValueDefaultImplementation(props) {
     if (props.dataItem) {
         const value = props.dataItem[props.column.field];
         return value === null || value === void 0 ? void 0 : value.toString();
     }
     return '';
 }
+exports.dataItemToValueDefaultImplementation = dataItemToValueDefaultImplementation;
 //# sourceMappingURL=Sheet.js.map

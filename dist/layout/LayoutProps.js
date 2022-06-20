@@ -1,3 +1,4 @@
+"use strict";
 var __rest = (this && this.__rest) || function (s, e) {
     var t = {};
     for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
@@ -9,7 +10,9 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-import { useMemo } from "react";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.useLayoutPropsValue = void 0;
+const react_1 = require("react");
 const H_ALIGN = {
     horizontal: {
         left: 'flex-start',
@@ -34,10 +37,10 @@ const V_ALIGN = {
         center: 'center'
     }
 };
-export function useLayoutPropsValue(props, isHorizontal) {
+function useLayoutPropsValue(props, isHorizontal) {
     const { hAlign, vAlign, mT, mL, mR, mB, m, pT, pL, pR, pB, p, w, h, r, rTL, rTR, rBL, rBR, overflow, backgroundColor, color, position, top, left, right, bottom, style: propsStyle } = props, properties = __rest(props, ["hAlign", "vAlign", "mT", "mL", "mR", "mB", "m", "pT", "pL", "pR", "pB", "p", "w", "h", "r", "rTL", "rTR", "rBL", "rBR", "overflow", "backgroundColor", "color", "position", "top", "left", "right", "bottom", "style"]);
     const propsStyleString = JSON.stringify(propsStyle);
-    const style = useMemo(() => {
+    const style = (0, react_1.useMemo)(() => {
         const propsStyle = JSON.parse(propsStyleString);
         const justifyContent = hAlign === undefined ? hAlign : (isHorizontal ? H_ALIGN.horizontal : H_ALIGN.vertical)[hAlign];
         const alignItems = vAlign === undefined ? vAlign : (isHorizontal ? V_ALIGN.horizontal : V_ALIGN.vertical)[vAlign];
@@ -107,4 +110,5 @@ export function useLayoutPropsValue(props, isHorizontal) {
         bottom, color, propsStyleString]);
     return { style, properties };
 }
+exports.useLayoutPropsValue = useLayoutPropsValue;
 //# sourceMappingURL=LayoutProps.js.map

@@ -1,6 +1,6 @@
 {
   "name": "react-hook-components",
-  "version": "1.0.0-alpha.17",
+  "version": "1.0.0-alpha.23",
   "private": false,
   "author": {
     "email": "a.arif.r@gmail.com",
@@ -11,14 +11,11 @@
     "url": "https://github.com/arif-rachim/react-hook-components.git"
   },
   "license": "MIT",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc -p .",
     "start": "npm run build -- -w",
     "test": "jest --coverage"
-  },
-  "peerDependencies": {
-    "react": ">=16.0.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.14.7",
@@ -40,6 +37,7 @@
     "wait-for-expect": "^3.0.2"
   },
   "dependencies": {
+    "react": "^16.0.0",
     "@types/cleave.js": "^1.4.6",
     "cleave.js": "^1.6.0",
     "react-hook-useobserver": "^1.0.0-alpha.16",
