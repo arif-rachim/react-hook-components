@@ -39,7 +39,7 @@ const V_ALIGN = {
 };
 function useLayoutPropsValue(props, isHorizontal) {
     const { hAlign, vAlign, mT, mL, mR, mB, m, pT, pL, pR, pB, p, w, h, r, rTL, rTR, rBL, rBR, overflow, backgroundColor, color, position, top, left, right, bottom, style: propsStyle } = props, properties = __rest(props, ["hAlign", "vAlign", "mT", "mL", "mR", "mB", "m", "pT", "pL", "pR", "pB", "p", "w", "h", "r", "rTL", "rTR", "rBL", "rBR", "overflow", "backgroundColor", "color", "position", "top", "left", "right", "bottom", "style"]);
-    const propsStyleString = JSON.stringify(propsStyle);
+    const propsStyleString = JSON.stringify(propsStyle !== null && propsStyle !== void 0 ? propsStyle : '{}');
     const style = (0, react_1.useMemo)(() => {
         const propsStyle = JSON.parse(propsStyleString);
         const justifyContent = hAlign === undefined ? hAlign : (isHorizontal ? H_ALIGN.horizontal : H_ALIGN.vertical)[hAlign];

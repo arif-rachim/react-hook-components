@@ -88,12 +88,14 @@ export function useLayoutPropsValue(props: LayoutProps, isHorizontal: boolean) {
         style: propsStyle,
         ...properties
     } = props;
-    const propsStyleString = JSON.stringify(propsStyle);
+
+    const propsStyleString = JSON.stringify(propsStyle ?? '{}');
+
     const style = useMemo(() => {
-        const propsStyle = JSON.parse(propsStyleString);
+        const propsStyle:any = JSON.parse(propsStyleString);
         const justifyContent = hAlign === undefined ? hAlign : (isHorizontal ? H_ALIGN.horizontal : H_ALIGN.vertical)[hAlign];
         const alignItems = vAlign === undefined ? vAlign : (isHorizontal ? V_ALIGN.horizontal : V_ALIGN.vertical)[vAlign];
-        const localStyle: CSSProperties = {};
+        const localStyle: any & CSSProperties = {};
         localStyle.display = 'flex';
         localStyle.flexDirection = isHorizontal ? 'row' : 'column';
         localStyle.boxSizing = 'border-box';
