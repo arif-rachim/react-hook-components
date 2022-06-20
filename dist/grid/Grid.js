@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.defaultCellSpanFunction = exports.Grid = exports.CellComponentForColumnHeader = void 0;
 const Sheet_1 = require("./Sheet");
+const React = require("react");
 const react_1 = require("react");
 const io5_1 = require("react-icons/io5");
 const Vertical_1 = require("../layout/Vertical");
@@ -30,7 +31,7 @@ const CellComponentForColumnHeaderBase = (props) => {
     }, []);
     const title = props.dataItem[props.column.field];
     const shouldHaveResizeHandler = (props.rowIndex + ((props === null || props === void 0 ? void 0 : props.rowSpan) || 0)) === props.dataSource.length;
-    return react_1.default.createElement(Vertical_1.Vertical, { ref: containerRef, style: {
+    return React.createElement(Vertical_1.Vertical, { ref: containerRef, style: {
             padding: '0px 0px',
             width: '100%',
             height: '100%',
@@ -39,9 +40,9 @@ const CellComponentForColumnHeaderBase = (props) => {
             flexGrow: 0,
             position: 'relative'
         } },
-        react_1.default.createElement(CellComponentForColHeader, { column: gridColumn, colIndex: props.colIndex, rowIndex: props.rowIndex, field: gridColumn.field, title: title, dataSource: props.dataSource, rowSpan: props.rowSpan, colSpan: props.colSpan }),
+        React.createElement(CellComponentForColHeader, { column: gridColumn, colIndex: props.colIndex, rowIndex: props.rowIndex, field: gridColumn.field, title: title, dataSource: props.dataSource, rowSpan: props.rowSpan, colSpan: props.colSpan }),
         shouldHaveResizeHandler &&
-            react_1.default.createElement(Vertical_1.Vertical, { ref: handlerRef, style: {
+            React.createElement(Vertical_1.Vertical, { ref: handlerRef, style: {
                     height: '100%',
                     position: 'absolute',
                     backgroundColor: 'rgba(0,0,0,0)',
@@ -63,7 +64,7 @@ const CellComponentToResizeRow = (props) => {
     (0, react_1.useEffect)(() => {
         handlerBottomRef.current.style.top = `${containerRef.current.getBoundingClientRect().height - Math.ceil(0.5 * HANDLER_LENGTH)}px`;
     }, []);
-    return react_1.default.createElement(Vertical_1.Vertical, { ref: containerRef, style: {
+    return React.createElement(Vertical_1.Vertical, { ref: containerRef, style: {
             padding: '3px 5px',
             width: '100%',
             height: '100%',
@@ -72,7 +73,7 @@ const CellComponentToResizeRow = (props) => {
             flexGrow: 0,
             position: 'relative'
         } },
-        react_1.default.createElement(Vertical_1.Vertical, { ref: handlerBottomRef, style: {
+        React.createElement(Vertical_1.Vertical, { ref: handlerBottomRef, style: {
                 width: '100%',
                 position: 'absolute',
                 backgroundColor: 'rgba(0,0,0,0)',
@@ -150,9 +151,9 @@ function SortComponent({ field }) {
         const sort = gridSort.find(sort => sort.field === field);
         return sort === null || sort === void 0 ? void 0 : sort.direction;
     });
-    return react_1.default.createElement(Vertical_1.Vertical, { style: { flexShrink: 0, flexGrow: 0, marginLeft: 0, color: 'crimson' } },
-        direction === SORT_DIRECTION.ASC && react_1.default.createElement(io5_1.IoArrowUp, null),
-        direction === SORT_DIRECTION.DESC && react_1.default.createElement(io5_1.IoArrowDown, null));
+    return React.createElement(Vertical_1.Vertical, { style: { flexShrink: 0, flexGrow: 0, marginLeft: 0, color: 'crimson' } },
+        direction === SORT_DIRECTION.ASC && React.createElement(io5_1.IoArrowUp, null),
+        direction === SORT_DIRECTION.DESC && React.createElement(io5_1.IoArrowDown, null));
 }
 function CellComponentForColumnHeader(props) {
     const column = props.column;
@@ -184,14 +185,14 @@ function CellComponentForColumnHeader(props) {
         });
     }
     const shouldHaveFilter = (props.rowIndex + ((props === null || props === void 0 ? void 0 : props.rowSpan) || 0)) === props.dataSource.length;
-    return react_1.default.createElement(Vertical_1.Vertical, { style: { height: '100%' } },
-        react_1.default.createElement(Vertical_1.Vertical, { style: { flexGrow: 1, padding: '0px 5px', backgroundColor: '#ddd', color: '#333', fontWeight: 'bold' }, hAlign: props.column.hAlign, vAlign: 'center', onClick: handleSortClicked },
-            react_1.default.createElement(Horizontal_1.Horizontal, null,
+    return React.createElement(Vertical_1.Vertical, { style: { height: '100%' } },
+        React.createElement(Vertical_1.Vertical, { style: { flexGrow: 1, padding: '0px 5px', backgroundColor: '#ddd', color: '#333', fontWeight: 'bold' }, hAlign: props.column.hAlign, vAlign: 'center', onClick: handleSortClicked },
+            React.createElement(Horizontal_1.Horizontal, null,
                 props.title,
                 shouldHaveFilter &&
-                    react_1.default.createElement(SortComponent, { field: gridColumn.field }))),
+                    React.createElement(SortComponent, { field: gridColumn.field }))),
         shouldHaveFilter && filterHidden !== true &&
-            react_1.default.createElement(FilterCellComponent, { title: props.title, field: props.field, colIndex: props.colIndex, column: gridColumn, rowIndex: props.rowIndex, dataSource: props.dataSource, colSpan: props.colSpan, rowSpan: props.colSpan }));
+            React.createElement(FilterCellComponent, { title: props.title, field: props.field, colIndex: props.colIndex, column: gridColumn, rowIndex: props.rowIndex, dataSource: props.dataSource, colSpan: props.colSpan, rowSpan: props.colSpan }));
 }
 exports.CellComponentForColumnHeader = CellComponentForColumnHeader;
 function CellComponentForColumnHeaderFilter(props) {
@@ -201,8 +202,8 @@ function CellComponentForColumnHeaderFilter(props) {
         const value = arg;
         return value.get(props.field) || '';
     });
-    return react_1.default.createElement(Vertical_1.Vertical, { style: { borderTop: '1px solid #ddd' } },
-        react_1.default.createElement("input", { type: "text", value: value, style: { border: 'none', borderRadius: 0, padding: '2px 5px' }, onChange: (event) => {
+    return React.createElement(Vertical_1.Vertical, { style: { borderTop: '1px solid #ddd' } },
+        React.createElement("input", { type: "text", value: value, style: { border: 'none', borderRadius: 0, padding: '2px 5px' }, onChange: (event) => {
                 gridContextRef.current.setGridFilter((oldVal) => {
                     const newMap = new Map(oldVal);
                     newMap.set(props.field, event.target.value);
@@ -476,21 +477,21 @@ function Grid(gridProps) {
         const filteredData = filterDataSource(clonedData, $gridFilter, $columns.current);
         setData(filteredData);
     });
-    return react_1.default.createElement(Vertical_1.Vertical, { style: { height: '100%', width: '100%', overflow: 'auto' } },
-        react_1.default.createElement(GridContext.Provider, { value: gridContextRef },
+    return React.createElement(Vertical_1.Vertical, { style: { height: '100%', width: '100%', overflow: 'auto' } },
+        React.createElement(GridContext.Provider, { value: gridContextRef },
             headerHidden !== true &&
-                react_1.default.createElement(Horizontal_1.Horizontal, null,
+                React.createElement(Horizontal_1.Horizontal, null,
                     rowResizerHidden !== true &&
-                        react_1.default.createElement(Vertical_1.Vertical, { style: {
+                        React.createElement(Vertical_1.Vertical, { style: {
                                 flexBasis: FIRST_COLUMN_WIDTH,
                                 flexShrink: 0,
                                 flexGrow: 0,
                                 borderRight: '1px solid #ddd',
                                 borderBottom: '1px solid #ddd'
                             } }),
-                    react_1.default.createElement(Horizontal_1.Horizontal, { style: { height: '100%', flexGrow: 1, overflow: 'auto', position: 'relative' } },
-                        react_1.default.createElement(react_hook_useobserver_1.ObserverValue, { observers: [$pinnedLeftColumnWidth], render: () => {
-                                return react_1.default.createElement(Vertical_1.Vertical, { style: {
+                    React.createElement(Horizontal_1.Horizontal, { style: { height: '100%', flexGrow: 1, overflow: 'auto', position: 'relative' } },
+                        React.createElement(react_hook_useobserver_1.ObserverValue, { observers: [$pinnedLeftColumnWidth], render: () => {
+                                return React.createElement(Vertical_1.Vertical, { style: {
                                         width: $pinnedLeftColumnWidth.current,
                                         overflow: 'auto',
                                         flexShrink: 0,
@@ -498,21 +499,21 @@ function Grid(gridProps) {
                                         position: 'absolute',
                                         zIndex: 1,
                                     } },
-                                    react_1.default.createElement(Sheet_1.Sheet, { data: headerData, columns: columnsHeaderColumn.filter((value, index) => index <= hideLeftColumnIndex), "$customColWidth": $customColWidth, styleContainer: { width: '100%' }, showScroller: false, defaultRowHeight: defaultHeaderRowHeight || HEADER_HEIGHT, defaultColWidth: defaultColWidth, hideLeftColumnIndex: -1, rowHeightCallback: headerRowHeightCallback }));
+                                    React.createElement(Sheet_1.Sheet, { data: headerData, columns: columnsHeaderColumn.filter((value, index) => index <= hideLeftColumnIndex), "$customColWidth": $customColWidth, styleContainer: { width: '100%' }, showScroller: false, defaultRowHeight: defaultHeaderRowHeight || HEADER_HEIGHT, defaultColWidth: defaultColWidth, hideLeftColumnIndex: -1, rowHeightCallback: headerRowHeightCallback }));
                             } }),
-                        react_1.default.createElement(Vertical_1.Vertical, { style: { flexGrow: 1, overflow: 'auto' } },
-                            react_1.default.createElement(Sheet_1.Sheet, { data: headerData, ref: gridHeaderRef, columns: columnsHeaderColumn, "$customColWidth": $customColWidth, showScroller: false, defaultRowHeight: defaultHeaderRowHeight || HEADER_HEIGHT, defaultColWidth: defaultColWidth, hideLeftColumnIndex: hideLeftColumnIndex, sheetHeightFollowsTotalRowsHeight: true, rowHeightCallback: headerRowHeightCallback })))),
-            react_1.default.createElement(Horizontal_1.Horizontal, { style: {
+                        React.createElement(Vertical_1.Vertical, { style: { flexGrow: 1, overflow: 'auto' } },
+                            React.createElement(Sheet_1.Sheet, { data: headerData, ref: gridHeaderRef, columns: columnsHeaderColumn, "$customColWidth": $customColWidth, showScroller: false, defaultRowHeight: defaultHeaderRowHeight || HEADER_HEIGHT, defaultColWidth: defaultColWidth, hideLeftColumnIndex: hideLeftColumnIndex, sheetHeightFollowsTotalRowsHeight: true, rowHeightCallback: headerRowHeightCallback })))),
+            React.createElement(Horizontal_1.Horizontal, { style: {
                     height: `calc(100% - ${headerHidden === true ? 0 : (defaultHeaderRowHeight || HEADER_HEIGHT)}px)`,
                     width: '100%',
                     overflow: 'auto'
                 } },
                 rowResizerHidden !== true &&
-                    react_1.default.createElement(Vertical_1.Vertical, { style: { flexBasis: FIRST_COLUMN_WIDTH, flexShrink: 0, flexGrow: 0 } },
-                        react_1.default.createElement(Sheet_1.Sheet, { data: sheetDataToResizeRow, columns: columnDataToResizeRow, "$customRowHeight": $customRowHeight, ref: gridRowResizerRef, showScroller: false, defaultColWidth: FIRST_COLUMN_WIDTH, defaultRowHeight: defaultRowHeight, hideLeftColumnIndex: -1 })),
-                react_1.default.createElement(Horizontal_1.Horizontal, { style: { height: '100%', flexGrow: 1, overflow: 'auto', position: 'relative' } },
-                    react_1.default.createElement(react_hook_useobserver_1.ObserverValue, { observers: [$pinnedLeftColumnWidth, $data, $columns], render: () => {
-                            return react_1.default.createElement(Vertical_1.Vertical, { style: {
+                    React.createElement(Vertical_1.Vertical, { style: { flexBasis: FIRST_COLUMN_WIDTH, flexShrink: 0, flexGrow: 0 } },
+                        React.createElement(Sheet_1.Sheet, { data: sheetDataToResizeRow, columns: columnDataToResizeRow, "$customRowHeight": $customRowHeight, ref: gridRowResizerRef, showScroller: false, defaultColWidth: FIRST_COLUMN_WIDTH, defaultRowHeight: defaultRowHeight, hideLeftColumnIndex: -1 })),
+                React.createElement(Horizontal_1.Horizontal, { style: { height: '100%', flexGrow: 1, overflow: 'auto', position: 'relative' } },
+                    React.createElement(react_hook_useobserver_1.ObserverValue, { observers: [$pinnedLeftColumnWidth, $data, $columns], render: () => {
+                            return React.createElement(Vertical_1.Vertical, { style: {
                                     width: $pinnedLeftColumnWidth.current,
                                     flexShrink: 0,
                                     flexGrow: 0,
@@ -521,7 +522,7 @@ function Grid(gridProps) {
                                     position: 'absolute',
                                     zIndex: 1
                                 } },
-                                react_1.default.createElement(Sheet_1.Sheet, { ref: gridLeftPinnedRef, data: $data.current, columns: $columns.current.filter((value, index) => index <= hideLeftColumnIndex), "$customRowHeight": $customRowHeight, "$customColWidth": $customColWidth, showScroller: false, defaultColWidth: defaultColWidth, styleContainer: { width: '100%' }, defaultRowHeight: defaultRowHeight, onCellClicked: event => {
+                                React.createElement(Sheet_1.Sheet, { ref: gridLeftPinnedRef, data: $data.current, columns: $columns.current.filter((value, index) => index <= hideLeftColumnIndex), "$customRowHeight": $customRowHeight, "$customColWidth": $customColWidth, showScroller: false, defaultColWidth: defaultColWidth, styleContainer: { width: '100%' }, defaultRowHeight: defaultRowHeight, onCellClicked: event => {
                                         if (gridProps.onFocusedDataItemChange) {
                                             gridProps.onFocusedDataItemChange(event.dataItem, $focusedDataItem.current);
                                         }
@@ -530,9 +531,9 @@ function Grid(gridProps) {
                                         }
                                     }, hideLeftColumnIndex: -1, "$focusedDataItem": $focusedDataItem }));
                         } }),
-                    react_1.default.createElement(Vertical_1.Vertical, { ref: viewportRef, style: { height: '100%', flexGrow: 1, overflow: 'auto' } },
-                        react_1.default.createElement(react_hook_useobserver_1.ObserverValue, { observers: [$data, $columns], render: () => {
-                                return react_1.default.createElement(Sheet_1.Sheet, { data: $data.current, columns: $columns.current, "$customRowHeight": $customRowHeight, "$customColWidth": $customColWidth, onScroll: ({ scrollLeft, scrollTop }) => {
+                    React.createElement(Vertical_1.Vertical, { ref: viewportRef, style: { height: '100%', flexGrow: 1, overflow: 'auto' } },
+                        React.createElement(react_hook_useobserver_1.ObserverValue, { observers: [$data, $columns], render: () => {
+                                return React.createElement(Sheet_1.Sheet, { data: $data.current, columns: $columns.current, "$customRowHeight": $customRowHeight, "$customColWidth": $customColWidth, onScroll: ({ scrollLeft, scrollTop }) => {
                                         gridLeftPinnedRef.current.setScrollerPosition({ left: 0, top: scrollTop });
                                         gridRowResizerRef.current.setScrollerPosition({ left: 0, top: scrollTop });
                                         gridHeaderRef.current.setScrollerPosition({ left: scrollLeft, top: 0 });

@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 export declare type ShowPanelType = (close: (result: any) => void, containerDimension: {
     width: number;
     height: number;

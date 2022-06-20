@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { Dispatch, Initialization, SetObserverAction } from "react-hook-useobserver/lib";
 import { Observer } from "react-hook-useobserver/lib/useObserver";
 import { CleaveOptions } from "cleave.js/options";

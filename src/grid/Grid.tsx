@@ -8,7 +8,8 @@ import {
     Sheet,
     SheetRef
 } from "./Sheet";
-import React, {
+import * as React from "react";
+import  {
     createContext,
     FC,
     MouseEvent as ReactMouseEvent,

@@ -1,4 +1,5 @@
-import React, {createContext, useContext, useEffect, useMemo, useRef} from "react";
+import * as React from "react";
+import {createContext, useContext, useEffect, useMemo, useRef} from "react";
 import {
     Dispatch,
     emptyObserver,
@@ -9,7 +10,7 @@ import {
     useObserverValue
 } from "react-hook-useobserver/lib";
 import {Observer} from "react-hook-useobserver/lib/useObserver";
-import Cleave from "cleave.js/react";
+import * as Cleave from "cleave.js/react";
 import {CleaveOptions} from "cleave.js/options";
 import {ChangeEventHandler, InitHandler} from "cleave.js/react/props";
 

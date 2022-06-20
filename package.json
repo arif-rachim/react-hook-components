@@ -1,6 +1,6 @@
 {
   "name": "react-hook-components",
-  "version": "1.0.0-alpha.24",
+  "version": "1.0.0-alpha.26",
   "private": false,
   "author": {
     "email": "a.arif.r@gmail.com",
@@ -40,7 +40,7 @@
     "react": "^16.0.0",
     "@types/cleave.js": "^1.4.6",
     "cleave.js": "^1.6.0",
-    "react-hook-useobserver": "^1.0.0-alpha.16",
+    "react-hook-useobserver": "^1.0.0-alpha.17",
     "react-icons": "^4.3.1"
   }
 }

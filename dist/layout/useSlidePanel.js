@@ -12,6 +12,7 @@ var __rest = (this && this.__rest) || function (s, e) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.useSlidePanel = void 0;
+const React = require("react");
 const react_1 = require("react");
 const react_hook_useobserver_1 = require("react-hook-useobserver");
 const Vertical_1 = require("./Vertical");
@@ -57,8 +58,8 @@ function SlidePanelChild(props) {
             removeOnPanelOpen();
         };
     }, []);
-    return react_1.default.createElement(Vertical_1.Vertical, { style: Object.assign(Object.assign({ position: 'absolute', boxSizing: 'border-box', overflow: 'auto' }, props.$containerDimension.current), style) },
-        react_1.default.createElement(Vertical_1.Vertical, { ref: childContainerRef }, props.panel.panel));
+    return React.createElement(Vertical_1.Vertical, { style: Object.assign(Object.assign({ position: 'absolute', boxSizing: 'border-box', overflow: 'auto' }, props.$containerDimension.current), style) },
+        React.createElement(Vertical_1.Vertical, { ref: childContainerRef }, props.panel.panel));
 }
 function OverlayPanel(props) {
     const domRef = (0, react_1.useRef)(emptyDiv);
@@ -73,7 +74,7 @@ function OverlayPanel(props) {
             }, animationDuration);
         }
     }, [hasPanel]);
-    return react_1.default.createElement(Vertical_1.Vertical, { ref: domRef, style: Object.assign(Object.assign({ backgroundColor: `rgba(0,0,0,${props.hasPanel ? 0.2 : 0})` }, props.$containerDimension.current), { top: 0, left: 0, position: 'absolute', transition: `background-color ${animationDuration - 100}ms ease-in-out` }) });
+    return React.createElement(Vertical_1.Vertical, { ref: domRef, style: Object.assign(Object.assign({ backgroundColor: `rgba(0,0,0,${props.hasPanel ? 0.2 : 0})` }, props.$containerDimension.current), { top: 0, left: 0, position: 'absolute', transition: `background-color ${animationDuration - 100}ms ease-in-out` }) });
 }
 /**
  * Hook to display slidePanel, the default implementation is slide panel from top to bottom.
@@ -135,17 +136,17 @@ function useSlidePanel() {
                 const { width, height } = containerRef.current.getBoundingClientRect();
                 setContainerDimension({ width, height });
             }, []);
-            return react_1.default.createElement(Vertical_1.Vertical, Object.assign({ ref: containerRef, overflow: "hidden", position: "relative", backgroundColor: 'rgba(0,0,0,0.1)', style: style }, properties),
+            return React.createElement(Vertical_1.Vertical, Object.assign({ ref: containerRef, overflow: "hidden", position: "relative", backgroundColor: 'rgba(0,0,0,0.1)', style: style }, properties),
                 props.children,
-                react_1.default.createElement(react_hook_useobserver_1.ObserverValue, { observers: [$panels, $containerDimension], render: () => {
+                React.createElement(react_hook_useobserver_1.ObserverValue, { observers: [$panels, $containerDimension], render: () => {
                         const hasPanel = $panels.current.length > 0;
                         const lastPanel = $panels.current[$panels.current.length - 1];
                         const overlayHidden = lastPanel === null || lastPanel === void 0 ? void 0 : lastPanel.overlayHidden;
-                        return react_1.default.createElement(react_1.default.Fragment, null,
+                        return React.createElement(React.Fragment, null,
                             !overlayHidden &&
-                                react_1.default.createElement(OverlayPanel, { hasPanel: hasPanel, "$containerDimension": $containerDimension }),
+                                React.createElement(OverlayPanel, { hasPanel: hasPanel, "$containerDimension": $containerDimension }),
                             $panels.current.map((panel, index) => {
-                                return react_1.default.createElement(SlidePanelChild, { key: index, index: index, "$containerDimension": $containerDimension, panel: panel });
+                                return React.createElement(SlidePanelChild, { key: index, index: index, "$containerDimension": $containerDimension, panel: panel });
                             }));
                     } }));
         }

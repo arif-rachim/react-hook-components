@@ -10,8 +10,8 @@ const LayoutProps_1 = require("./LayoutProps");
  * 3. box-sizing : border-box.
  * Vertical also has vAlign and hAlign attributes, which can be used to adjust the alignment position of its children.
  */
-exports.Vertical = react_1.default.forwardRef((props, ref) => {
+exports.Vertical = (0, react_1.forwardRef)((props, ref) => {
     const { style, properties } = (0, LayoutProps_1.useLayoutPropsValue)(props, false);
-    return react_1.default.createElement("div", Object.assign({ ref: ref, style: style }, properties), properties.children);
+    return (0, react_1.createElement)('div', Object.assign({ ref: ref, style: style }, properties), properties.children);
 });
 //# sourceMappingURL=Vertical.js.map

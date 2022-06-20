@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.dataItemToValueDefaultImplementation = exports.Sheet = void 0;
+const React = require("react");
 const react_1 = require("react");
 const react_hook_useobserver_1 = require("react-hook-useobserver");
 const Vertical_1 = require("../layout/Vertical");
@@ -10,7 +11,7 @@ function cellSpanFunctionDefaultImplementation() {
 }
 const defaultDom = document.createElement('div');
 const CellComponentDefaultImplementation = (props) => {
-    return react_1.default.createElement(Vertical_1.Vertical, { style: props.cellStyle, vAlign: 'center' }, props.value);
+    return React.createElement(Vertical_1.Vertical, { style: props.cellStyle, vAlign: 'center' }, props.value);
 };
 function cellStyleFunctionDefaultImplementation(props) {
     const isFocused = props.isFocused;
@@ -24,7 +25,7 @@ function cellStyleFunctionDefaultImplementation(props) {
 }
 const SheetContext = (0, react_1.createContext)({ current: { props: undefined } });
 const defaultLengthCallback = props => props.length;
-exports.Sheet = react_1.default.forwardRef(function Sheet(props, ref) {
+exports.Sheet = React.forwardRef(function Sheet(props, ref) {
     const propsRef = (0, react_1.useRef)(props);
     propsRef.current = props;
     const { sheetHeightFollowsTotalRowsHeight } = props;
@@ -108,15 +109,15 @@ exports.Sheet = react_1.default.forwardRef(function Sheet(props, ref) {
             });
         setScrollerPosition({ left: viewPortDom.scrollLeft, top: viewPortDom.scrollTop });
     }, [setScrollerPosition]);
-    return react_1.default.createElement(SheetContext.Provider, { value: sheetContextRef },
-        react_1.default.createElement("div", { ref: viewPortRef, style: {
+    return React.createElement(SheetContext.Provider, { value: sheetContextRef },
+        React.createElement("div", { ref: viewPortRef, style: {
                 width: '100%',
                 height: '100%',
                 overflow: propsRef.current.showScroller === false ? 'hidden' : 'auto',
                 boxSizing: 'border-box',
                 backgroundColor: '#fefefe',
             }, onScroll: handleScroller },
-            react_1.default.createElement("div", { style: Object.assign({ width: $totalWidthOfContent.current, height: $totalHeightOfContent.current, boxSizing: 'border-box', position: 'relative' }, propsRef.current.styleViewPort) }, elements)));
+            React.createElement("div", { style: Object.assign({ width: $totalWidthOfContent.current, height: $totalHeightOfContent.current, boxSizing: 'border-box', position: 'relative' }, propsRef.current.styleViewPort) }, elements)));
 });
 function calculateBeforeViewPort(columns, customLength = new Map(), defaultLength = 50, scrollerPosition = 0, calcLengthCallback = defaultLengthCallback) {
     return columns.reduce((acc, _, index) => {
@@ -168,7 +169,7 @@ function calculateLength(customLength = new Map(), data, defaultLength = 0, calc
     }, 0);
     return totalDefaultLength + totalCustomLength;
 }
-const CellRenderer = react_1.default.memo(function CellRenderer(props) {
+const CellRenderer = React.memo(function CellRenderer(props) {
     var _a, _b, _c;
     const sheetContext = (0, react_1.useContext)(SheetContext);
     const cellStyleFunction = props.column.cellStyleFunction || cellStyleFunctionDefaultImplementation;
@@ -187,7 +188,7 @@ const CellRenderer = react_1.default.memo(function CellRenderer(props) {
     const focusedItem = (_c = (_b = sheetContext.current.props) === null || _b === void 0 ? void 0 : _b.$focusedDataItem) === null || _c === void 0 ? void 0 : _c.current;
     const cellStyle = cellStyleFunction(Object.assign({ isFocused, focusedItem }, props));
     const CellComponent = props.column.cellComponent || CellComponentDefaultImplementation;
-    return react_1.default.createElement("div", { style: Object.assign({ position: 'absolute', height: props.height, width: props.width, top: props.top, left: props.left, borderBottom: BORDER, borderRight: BORDER, boxSizing: 'border-box', overflow: 'visible', display: 'flex', flexDirection: 'column' }, props.style), onClick: (event) => {
+    return React.createElement("div", { style: Object.assign({ position: 'absolute', height: props.height, width: props.width, top: props.top, left: props.left, borderBottom: BORDER, borderRight: BORDER, boxSizing: 'border-box', overflow: 'visible', display: 'flex', flexDirection: 'column' }, props.style), onClick: (event) => {
             var _a, _b;
             if ((_b = (_a = sheetContext.current) === null || _a === void 0 ? void 0 : _a.props) === null || _b === void 0 ? void 0 : _b.onCellClicked) {
                 sheetContext.current.props.onCellClicked({
@@ -240,7 +241,7 @@ const CellRenderer = react_1.default.memo(function CellRenderer(props) {
                 });
             }
         } },
-        react_1.default.createElement(CellComponent, { value: props.value, column: props.column, dataItem: props.dataItem, dataSource: props.dataSource, rowIndex: props.rowIndex, colIndex: props.colIndex, cellStyle: cellStyle, rowSpan: props.rowSpan, colSpan: props.colSpan }));
+        React.createElement(CellComponent, { value: props.value, column: props.column, dataItem: props.dataItem, dataSource: props.dataSource, rowIndex: props.rowIndex, colIndex: props.colIndex, cellStyle: cellStyle, rowSpan: props.rowSpan, colSpan: props.colSpan }));
 });
 function calculateCellToBeSkippedDuringRendering(param) {
     const { lastColIndexBeforeViewPort, data, lastRowIndexBeforeViewPort, columns, lastRowIndexInsideViewPort, lastColIndexInsideViewPort } = param;
@@ -361,7 +362,7 @@ function renderComponent({ setElements, data, columns, hideLeftColumnIndex, cust
                 }, 0);
             }
             if (colIndex > hideLeftColumnIndex) {
-                colAcc.elements.push(react_1.default.createElement(CellRenderer, { key: `${rowIndex}-${colIndex}`, rowIndex: rowIndex, colIndex: colIndex, top: acc.top, width: accumulatedColWidth, dataSource: data, dataItem: dataItem, value: value, column: column, left: colAcc.left, height: accumulatedRowHeight, colSpan: colSpan, rowSpan: rowSpan }));
+                colAcc.elements.push(React.createElement(CellRenderer, { key: `${rowIndex}-${colIndex}`, rowIndex: rowIndex, colIndex: colIndex, top: acc.top, width: accumulatedColWidth, dataSource: data, dataItem: dataItem, value: value, column: column, left: colAcc.left, height: accumulatedRowHeight, colSpan: colSpan, rowSpan: rowSpan }));
             }
             colAcc.left = colAcc.left + colWidth;
             return colAcc;

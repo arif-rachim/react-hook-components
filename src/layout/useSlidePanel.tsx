@@ -1,4 +1,5 @@
-import React, {useEffect, useMemo, useRef, useState} from "react";
+import * as React from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import {ObserverValue, useObserver} from "react-hook-useobserver";
 import {Observer} from "react-hook-useobserver/lib/useObserver";
 import {Vertical} from "./Vertical";

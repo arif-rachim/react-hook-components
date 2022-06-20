@@ -6,7 +6,7 @@
     "declaration": true,
     "outDir": "./dist",
     "module": "CommonJS",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": false
   },
   "include": [
     "src/**/*"

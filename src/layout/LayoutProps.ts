@@ -1,6 +1,6 @@
-import React, {CSSProperties, useMemo} from "react";
+import {CSSProperties, useMemo,HTMLAttributes} from "react";
 
-export interface LayoutProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface LayoutProps extends HTMLAttributes<HTMLDivElement> {
     hAlign?: 'left' | 'right' | 'center';
     vAlign?: 'top' | 'bottom' | 'center';
     mT?: number;

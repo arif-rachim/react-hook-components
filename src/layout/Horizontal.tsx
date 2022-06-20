@@ -1,4 +1,4 @@
-import React, {ForwardedRef} from "react";
+import {ForwardedRef,forwardRef,createElement} from "react";
 import {LayoutProps, useLayoutPropsValue} from "./LayoutProps";
 
 
@@ -9,7 +9,7 @@ import {LayoutProps, useLayoutPropsValue} from "./LayoutProps";
  * 3. box-sizing : border-box.
  * Vertical also has vAlign and hAlign attributes, which can be used to adjust the alignment position of its children.
  */
-export const Horizontal =  React.forwardRef((props:LayoutProps,ref:ForwardedRef<HTMLDivElement>) => {
+export const Horizontal =  forwardRef((props:LayoutProps,ref:ForwardedRef<HTMLDivElement>) => {
     const {style,properties} = useLayoutPropsValue(props,true);
-    return <div ref={ref} style={style} {...properties}>{properties.children}</div>
+    return createElement('div',Object.assign({ ref: ref, style: style }, properties), properties.children);
 });
