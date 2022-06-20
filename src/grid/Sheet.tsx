@@ -15,7 +15,7 @@ import React, {
 } from "react";
 import {useObserver,useObserverListener} from "react-hook-useobserver";
 import {Observer} from "react-hook-useobserver/lib/useObserver";
-import Vertical from "../layout/Vertical";
+import {Vertical} from "../layout/Vertical";
 
 const BORDER = '1px solid rgba(0,0,0,0.1)';
 

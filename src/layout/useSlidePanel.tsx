@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useRef, useState} from "react";
 import {ObserverValue, useObserver} from "react-hook-useobserver";
 import {Observer} from "react-hook-useobserver/lib/useObserver";
-import Vertical from "./Vertical";
+import {Vertical} from "./Vertical";
 
 
 interface PanelItem {
@@ -76,20 +76,21 @@ export interface ConfigType {
     animation?: AnimationType,
     overlayHidden?: boolean
 }
-function OverlayPanel(props:{hasPanel: boolean, $containerDimension:Observer<{width:number,height:number}>}) {
+
+function OverlayPanel(props: { hasPanel: boolean, $containerDimension: Observer<{ width: number, height: number }> }) {
     const domRef = useRef(emptyDiv);
     const hasPanel = props.hasPanel;
 
     useEffect(() => {
 
-        if(hasPanel){
+        if (hasPanel) {
             domRef.current.style.zIndex = '0';
-        }else{
+        } else {
             setTimeout(() => {
                 domRef.current.style.zIndex = '-1';
-            },animationDuration)
+            }, animationDuration)
         }
-    },[hasPanel]);
+    }, [hasPanel]);
     return <Vertical ref={domRef} style={{
         backgroundColor: `rgba(0,0,0,${props.hasPanel ? 0.2 : 0})`, ...props.$containerDimension.current,
         top: 0,
@@ -168,22 +169,19 @@ export function useSlidePanel(): { showPanel: ShowPanelCallback; SlidePanel: Rea
                 const {width, height} = containerRef.current.getBoundingClientRect();
                 setContainerDimension({width, height});
             }, []);
-            return <Vertical ref={containerRef} style={{
-                backgroundColor: 'rgba(0,0,0,0.1)',
-                position: 'relative',
-                overflow: 'hidden',
-                boxSizing: 'border-box',
-                ...style
-            }} {...properties}>
+            return <Vertical ref={containerRef} overflow={"hidden"}
+                             position={"relative"}
+                             backgroundColor={'rgba(0,0,0,0.1)'}
+                             style={style} {...properties}>
                 {props.children}
 
                 <ObserverValue observers={[$panels, $containerDimension]} render={() => {
                     const hasPanel = $panels.current.length > 0;
-                    const lastPanel = $panels.current[$panels.current.length-1];
+                    const lastPanel = $panels.current[$panels.current.length - 1];
                     const overlayHidden = lastPanel?.overlayHidden;
                     return <>
                         {!overlayHidden &&
-                        <OverlayPanel hasPanel={hasPanel} $containerDimension={$containerDimension} />
+                            <OverlayPanel hasPanel={hasPanel} $containerDimension={$containerDimension}/>
                         }
                         {$panels.current.map((panel, index) => {
                             return <SlidePanelChild key={index} index={index} $containerDimension={$containerDimension}

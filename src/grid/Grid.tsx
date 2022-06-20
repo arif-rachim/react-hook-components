@@ -21,8 +21,8 @@ import React, {
     useRef
 } from "react";
 import {IoArrowDown, IoArrowUp} from "react-icons/io5";
-import Vertical from "../layout/Vertical";
-import Horizontal from "../layout/Horizontal";
+import {Vertical} from "../layout/Vertical";
+import {Horizontal} from "../layout/Horizontal";
 import {ObserverValue, useObserver, useObserverListener, useObserverValue} from "react-hook-useobserver";
 import {Observer} from "react-hook-useobserver/lib/useObserver";
 

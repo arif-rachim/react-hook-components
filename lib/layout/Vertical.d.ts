@@ -1,12 +1,5 @@
 import React from "react";
-/**
- * Properties for Vertical props
- */
-interface VerticalProps extends React.HTMLAttributes<HTMLDivElement> {
-    hAlign?: 'left' | 'right' | 'center' | undefined;
-    vAlign?: 'top' | 'bottom' | 'center' | undefined;
-}
-declare const _default: React.ForwardRefExoticComponent<VerticalProps & React.RefAttributes<HTMLDivElement>>;
+import { LayoutProps } from "./LayoutProps";
 /**
  * Vertical is a div element that has a predefined style in the form of
  * 1. layout : flex,
@@ -14,4 +7,4 @@ declare const _default: React.ForwardRefExoticComponent<VerticalProps & React.Re
  * 3. box-sizing : border-box.
  * Vertical also has vAlign and hAlign attributes, which can be used to adjust the alignment position of its children.
  */
-export default _default;
+export declare const Vertical: React.ForwardRefExoticComponent<LayoutProps & React.RefAttributes<HTMLDivElement>>;
