@@ -12,9 +12,10 @@ var __rest = (this && this.__rest) || function (s, e) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Input = exports.useForm = exports.FormContext = void 0;
+const React = require("react");
 const react_1 = require("react");
 const lib_1 = require("react-hook-useobserver/lib");
-const react_2 = require("cleave.js/react");
+const Cleave = require("cleave.js/react");
 exports.FormContext = (0, react_1.createContext)({
     $state: lib_1.emptyObserver,
     $errors: lib_1.emptyObserver,
@@ -45,7 +46,7 @@ function useForm(initialState) {
             return $errors.current.size === 0;
         }
         function Form(props) {
-            return react_1.default.createElement(exports.FormContext.Provider, { value: {
+            return React.createElement(exports.FormContext.Provider, { value: {
                     $state,
                     setState,
                     $errors,
@@ -140,7 +141,7 @@ function Input(props) {
             return Object.assign(Object.assign({}, oldVal), { [props.field]: value });
         });
     }
-    return react_1.default.createElement(react_2.default, Object.assign({}, properties, { options: props.options, value: stringValue, onChange: (e) => {
+    return React.createElement(Cleave, Object.assign({}, properties, { options: props.options, value: stringValue, onChange: (e) => {
             const formStateFieldValue = e.target.value;
             const formStateFieldMappedValue = propsRef.current.valueMapper(formStateFieldValue);
             setModified(true);

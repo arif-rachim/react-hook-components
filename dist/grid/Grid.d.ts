@@ -1,5 +1,5 @@
 import { CalculateLengthCallback, CellSpanFunctionProps, CellSpanFunctionResult, Column } from "./Sheet";
-import React from "react";
+import * as React from "react";
 export interface GridProps {
     data: Array<any>;
     columns: Array<GridColumnGroup | GridColumn>;
