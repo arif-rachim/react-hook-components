@@ -1,4 +1,5 @@
-import {CSSProperties, useMemo,HTMLAttributes} from "react";
+import {CSSProperties, HTMLAttributes, useMemo} from "react";
+import {calculateBrightness} from "../utils";
 
 export interface LayoutProps extends HTMLAttributes<HTMLDivElement> {
     hAlign?: 'left' | 'right' | 'center';
@@ -22,6 +23,8 @@ export interface LayoutProps extends HTMLAttributes<HTMLDivElement> {
     rBR?: number;
     overflow?: "auto" | "clip" | "hidden" | "scroll" | "visible";
     backgroundColor?: string;
+    backgroundBrightness?: number;
+    backgroundOpacity?: number;
     color?: string;
     position?: "absolute" | "fixed" | "relative" | "static" | "sticky";
     top?: number;
@@ -79,6 +82,8 @@ export function useLayoutPropsValue(props: LayoutProps, isHorizontal: boolean) {
         rBR,
         overflow,
         backgroundColor,
+        backgroundBrightness,
+        backgroundOpacity,
         color,
         position,
         top,
@@ -92,7 +97,7 @@ export function useLayoutPropsValue(props: LayoutProps, isHorizontal: boolean) {
     const propsStyleString = JSON.stringify(propsStyle ?? '{}');
 
     const style = useMemo(() => {
-        const propsStyle:any = JSON.parse(propsStyleString);
+        const propsStyle: any = JSON.parse(propsStyleString);
         const justifyContent = hAlign === undefined ? hAlign : (isHorizontal ? H_ALIGN.horizontal : H_ALIGN.vertical)[hAlign];
         const alignItems = vAlign === undefined ? vAlign : (isHorizontal ? V_ALIGN.horizontal : V_ALIGN.vertical)[vAlign];
         const localStyle: any & CSSProperties = {};
@@ -119,7 +124,7 @@ export function useLayoutPropsValue(props: LayoutProps, isHorizontal: boolean) {
         localStyle.borderTopRightRadius = rTR;
         localStyle.borderBottomLeftRadius = rBL;
         localStyle.borderBottomRightRadius = rBR;
-        localStyle.backgroundColor = backgroundColor;
+        localStyle.backgroundColor = backgroundColor ? calculateBrightness(backgroundColor, backgroundBrightness || 0, backgroundOpacity || 1) : backgroundColor;
         localStyle.position = position;
         localStyle.top = top;
         localStyle.left = left;
@@ -154,6 +159,8 @@ export function useLayoutPropsValue(props: LayoutProps, isHorizontal: boolean) {
         rBR,
         overflow,
         backgroundColor,
+        backgroundBrightness,
+        backgroundOpacity,
         position,
         top,
         left,

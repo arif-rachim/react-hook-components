@@ -1,6 +1,6 @@
 {
   "name": "react-hook-components",
-  "version": "1.0.0-alpha.29",
+  "version": "1.0.0-alpha.30",
   "private": false,
   "author": {
     "email": "a.arif.r@gmail.com",
@@ -47,9 +47,11 @@
   },
   "dependencies": {
     "@types/cleave.js": "^1.4.6",
+    "@types/tinycolor2": "^1.4.3",
     "cleave.js": "^1.6.0",
     "react-hook-useobserver": "^1.0.0-alpha.18",
     "react-icons": "^4.3.1",
-    "tiny-invariant": "^1.2.0"
+    "tiny-invariant": "^1.2.0",
+    "tinycolor2": "^1.4.2"
   }
 }
