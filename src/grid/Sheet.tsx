@@ -15,7 +15,7 @@ import  {
     useState
 } from "react";
 import {useObserver,useObserverListener} from "react-hook-useobserver";
-import {Observer} from "react-hook-useobserver/lib/useObserver";
+import {Observer} from "react-hook-useobserver";
 import {Vertical} from "../layout/Vertical";
 
 const BORDER = '1px solid rgba(0,0,0,0.1)';
@@ -225,7 +225,7 @@ export const Sheet = React.forwardRef(function Sheet<DataItem>(props: SheetPrope
         const customRowHeight = ($customRowHeight?.current || new Map<number, number>());
         const defaultRowHeight = $defaultRowHeight.current;
         if (sheetHeightFollowsTotalRowsHeight) {
-            return props.data.reduce((total, data, index) => {
+            return props.data.reduce((total, _, index) => {
                 let length = (customRowHeight.has(index) ? customRowHeight.get(index) || defaultRowHeight : defaultRowHeight);
                 const rowHeightCallback = propsRef.current.rowHeightCallback || defaultLengthCallback;
                 length = rowHeightCallback({

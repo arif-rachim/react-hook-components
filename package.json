@@ -1,6 +1,6 @@
 {
   "name": "react-hook-components",
-  "version": "1.0.0-alpha.26",
+  "version": "1.0.0-alpha.27",
   "private": false,
   "author": {
     "email": "a.arif.r@gmail.com",
@@ -11,9 +11,13 @@
     "url": "https://github.com/arif-rachim/react-hook-components.git"
   },
   "license": "MIT",
-  "main": "dist/index.js",
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm/index.js",
+  "types": "./lib/esm/index.d.ts",
   "scripts": {
-    "build": "tsc -p .",
+    "build": "npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc -p . --module commonjs --outDir lib/cjs",
+    "build:esm": "tsc -p . --module esnext --outDir lib/esm",
     "start": "npm run build -- -w",
     "test": "jest --coverage"
   },
@@ -21,6 +25,7 @@
     "@babel/preset-env": "^7.14.7",
     "@babel/preset-react": "^7.14.5",
     "@types/enzyme": "^3.10.9",
+    "@types/enzyme-adapter-react-16": "^1.0.6",
     "@types/jest": "^26.0.24",
     "@types/react": "^16.14.11",
     "babel-jest": "^27.0.6",
@@ -40,7 +45,7 @@
     "react": "^16.0.0",
     "@types/cleave.js": "^1.4.6",
     "cleave.js": "^1.6.0",
-    "react-hook-useobserver": "^1.0.0-alpha.17",
+    "react-hook-useobserver": "^1.0.0-alpha.18",
     "react-icons": "^4.3.1"
   }
 }

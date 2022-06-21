@@ -25,7 +25,7 @@ import {IoArrowDown, IoArrowUp} from "react-icons/io5";
 import {Vertical} from "../layout/Vertical";
 import {Horizontal} from "../layout/Horizontal";
 import {ObserverValue, useObserver, useObserverListener, useObserverValue} from "react-hook-useobserver";
-import {Observer} from "react-hook-useobserver/lib/useObserver";
+import {Observer} from "react-hook-useobserver";
 
 export interface GridProps {
     data: Array<any>,
@@ -552,7 +552,7 @@ export function Grid(gridProps: GridProps) {
                     columnsWidth.set(key, width);
                 });
             } else {
-                columnsWidthPercentage.forEach((value, key) => {
+                columnsWidthPercentage.forEach((_, key) => {
                     columnsWidth.set(key, defaultColWidth || 0);
                 });
             }
@@ -657,7 +657,7 @@ export function Grid(gridProps: GridProps) {
                                 zIndex: 1,
                             }}>
                                 <Sheet data={headerData}
-                                       columns={columnsHeaderColumn.filter((value, index) => index <= hideLeftColumnIndex)}
+                                       columns={columnsHeaderColumn.filter((_, index) => index <= hideLeftColumnIndex)}
                                        $customColWidth={$customColWidth}
                                        styleContainer={{width: '100%'}}
                                        showScroller={false}
@@ -716,7 +716,7 @@ export function Grid(gridProps: GridProps) {
                             zIndex: 1
                         }}>
                             <Sheet ref={gridLeftPinnedRef} data={$data.current}
-                                   columns={$columns.current.filter((value, index) => index <= hideLeftColumnIndex)}
+                                   columns={$columns.current.filter((_, index) => index <= hideLeftColumnIndex)}
                                    $customRowHeight={$customRowHeight}
                                    $customColWidth={$customColWidth}
                                    showScroller={false}

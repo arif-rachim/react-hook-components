@@ -7,10 +7,9 @@ import {
     Initialization,
     SetObserverAction,
     useObserver,
-    useObserverValue
-} from "react-hook-useobserver/lib";
-import {Observer} from "react-hook-useobserver/lib/useObserver";
-import * as Cleave from "cleave.js/react";
+    useObserverValue,Observer
+} from "react-hook-useobserver";
+import Cleave from "cleave.js/react";
 import {CleaveOptions} from "cleave.js/options";
 import {ChangeEventHandler, InitHandler} from "cleave.js/react/props";
 
@@ -47,9 +46,9 @@ export function useForm<T>(initialState: Initialization<T>) {
     const [$validators, setValidators] = useObserver<Array<() => void>>([]);
     return useMemo(() => {
         function addValidator(validator: () => void) {
-            setValidators(old => [...old, validator]);
+            setValidators((old:any) => [...old, validator]);
             return function removeValidator() {
-                setValidators(old => old.filter(v => v !== validator));
+                setValidators((old:any) => old.filter((v:any) => v !== validator));
             }
         }
 
@@ -106,7 +105,7 @@ export interface ValidatorTypeProps {
 }
 
 export type ValidatorType = (props: ValidatorTypeProps) => string | Array<string>
-const defaultValidator: ValidatorType = props => [];
+const defaultValidator: ValidatorType = () => [];
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     field: string;
@@ -130,7 +129,7 @@ export function Input(props: InputProps) {
     const propsRef = useRef({valueMapper, valueConverter, validator});
     propsRef.current = {valueMapper, valueConverter, validator};
 
-    const rawValue = useObserverValue(context.$state, arg => {
+    const rawValue = useObserverValue(context.$state, () => {
         const state = context.$state.current || {};
         return state[props.field];
     })
@@ -194,7 +193,7 @@ export function Input(props: InputProps) {
         });
     }
 
-    return <Cleave {...properties} options={props.options} value={stringValue} onChange={(e) => {
+    return <Cleave {...properties} options={props.options} value={stringValue} onChange={(e:any) => {
         const formStateFieldValue = e.target.value;
         const formStateFieldMappedValue = propsRef.current.valueMapper(formStateFieldValue);
         setModified(true);
