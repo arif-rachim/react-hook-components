@@ -1,4 +1,5 @@
-import {ForwardedRef,forwardRef,createElement} from "react";
+import * as React from "react";
+import {ForwardedRef,forwardRef} from "react";
 import {LayoutProps, useLayoutPropsValue} from "./LayoutProps";
 
 
@@ -11,5 +12,5 @@ import {LayoutProps, useLayoutPropsValue} from "./LayoutProps";
  */
 export const Horizontal =  forwardRef((props:LayoutProps,ref:ForwardedRef<HTMLDivElement>) => {
     const {style,properties} = useLayoutPropsValue(props,true);
-    return createElement('div',Object.assign({ ref: ref, style: style }, properties), properties.children);
+    return <div ref={ref} style={style} {...properties}>{properties.children}</div>
 });

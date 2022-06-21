@@ -1,6 +1,6 @@
 {
   "name": "react-hook-components",
-  "version": "1.0.0-alpha.27",
+  "version": "1.0.0-alpha.28",
   "private": false,
   "author": {
     "email": "a.arif.r@gmail.com",
@@ -20,6 +20,10 @@
     "build:esm": "tsc -p . --module esnext --outDir lib/esm",
     "start": "npm run build -- -w",
     "test": "jest --coverage"
+  },
+  "peerDependencies": {
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.14.7",
@@ -42,7 +46,6 @@
     "wait-for-expect": "^3.0.2"
   },
   "dependencies": {
-    "react": "^16.0.0",
     "@types/cleave.js": "^1.4.6",
     "cleave.js": "^1.6.0",
     "react-hook-useobserver": "^1.0.0-alpha.18",
