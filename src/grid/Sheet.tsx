@@ -17,6 +17,7 @@ import  {
 import {useObserver,useObserverListener} from "react-hook-useobserver";
 import {Observer} from "react-hook-useobserver";
 import {Vertical} from "../layout/Vertical";
+import invariant from "tiny-invariant";
 
 const BORDER = '1px solid rgba(0,0,0,0.1)';
 
@@ -143,7 +144,7 @@ interface RenderComponentProps {
     rowHeightCallback?: CalculateLengthCallback
 }
 
-const defaultDom = document.createElement('div');
+
 type ScrollListener = (event: { scrollLeft: number, scrollTop: number }) => void;
 
 const CellComponentDefaultImplementation: React.FC<CellComponentStyledProps> = (props) => {
@@ -195,6 +196,7 @@ export const Sheet = React.forwardRef(function Sheet<DataItem>(props: SheetPrope
 
     useImperativeHandle(ref, () => {
         function updateScrollerPosition(scrollerPosition: { top: number; left: number }) {
+            invariant(viewPortRef.current,'viewPortRef is not initialized yet');
             viewPortRef.current.scrollLeft = scrollerPosition.left;
             viewPortRef.current.scrollTop = scrollerPosition.top;
             setScrollerPosition(scrollerPosition);
@@ -212,9 +214,10 @@ export const Sheet = React.forwardRef(function Sheet<DataItem>(props: SheetPrope
 
     useEffect(() => setTotalHeightOfContent(calculateLength($customRowHeight?.current, props.data, $defaultRowHeight.current, propsRef.current.rowHeightCallback)), [props.data, $customRowHeight, $defaultRowHeight, setTotalHeightOfContent]);
 
-    const viewPortRef = useRef(defaultDom);
+    const viewPortRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        invariant(viewPortRef.current,'viewportRef is not mounted');
         const viewPortDom = viewPortRef.current;
         let {offsetWidth, offsetHeight} = viewPortDom;
         setViewPortDimension({width: offsetWidth, height: offsetHeight});
@@ -264,6 +267,7 @@ export const Sheet = React.forwardRef(function Sheet<DataItem>(props: SheetPrope
 
     const handleScroller = useCallback(function handleScroller() {
         const viewPortDom = viewPortRef.current;
+        invariant(viewPortDom,'viewPortDom must exist');
         if (propsRef.current.onScroll) propsRef.current.onScroll({
             scrollLeft: viewPortDom.scrollLeft,
             scrollTop: viewPortDom.scrollTop

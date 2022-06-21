@@ -26,6 +26,7 @@ import {Vertical} from "../layout/Vertical";
 import {Horizontal} from "../layout/Horizontal";
 import {ObserverValue, useObserver, useObserverListener, useObserverValue} from "react-hook-useobserver";
 import {Observer} from "react-hook-useobserver";
+import invariant from "tiny-invariant";
 
 export interface GridProps {
     data: Array<any>,
@@ -69,8 +70,8 @@ const SCROLLER_WIDTH = 0;
 
 const CellComponentForColumnHeaderBase: FC<CellComponentProps> = (props) => {
     const index = props.colIndex;
-    const handlerRef = useRef(defaultDif);
-    const containerRef = useRef(defaultDif);
+    const handlerRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const gridContextRef = useContext(GridContext);
     const column: any = props.column;
     const gridColumn: GridColumn = column;
@@ -79,6 +80,8 @@ const CellComponentForColumnHeaderBase: FC<CellComponentProps> = (props) => {
     // eslint-disable-next-line
     const handleDrag = useCallback(dragListener(mousePositionRef, gridContextRef.current.onCellResize, index, containerRef, handlerRef, "horizontal"), []);
     useEffect(() => {
+        invariant(handlerRef.current,'Handler is not mounted yet');
+        invariant(containerRef.current,'Container is not mounted yet');
         handlerRef.current.style.left = `${containerRef.current.getBoundingClientRect().width - Math.ceil(0.5 * HANDLER_LENGTH)}px`;
     }, []);
 
@@ -115,14 +118,17 @@ const CellComponentForColumnHeaderBase: FC<CellComponentProps> = (props) => {
 
 const CellComponentToResizeRow: React.FC<CellComponentProps> = (props: CellComponentProps) => {
     const index = props.rowIndex;
-    const containerRef = useRef(defaultDif);
-    const handlerBottomRef = useRef(defaultDif);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const handlerBottomRef = useRef<HTMLDivElement>(null);
 
     const gridContextRef = useContext(GridContext);
     const mousePositionRef = useRef({current: 0, next: 0, dragActive: false});
     // eslint-disable-next-line
     const handleDrag = useCallback(dragListener(mousePositionRef, gridContextRef.current.onRowResize, index, containerRef, handlerBottomRef, "vertical"), []);
     useEffect(() => {
+        invariant(handlerBottomRef.current,'Handler bottom ref is not mounted yet');
+        invariant(containerRef.current,'Container is not mounted yet');
+
         handlerBottomRef.current.style.top = `${containerRef.current.getBoundingClientRect().height - Math.ceil(0.5 * HANDLER_LENGTH)}px`;
     }, []);
     return <Vertical ref={containerRef} style={{
@@ -147,7 +153,7 @@ const CellComponentToResizeRow: React.FC<CellComponentProps> = (props: CellCompo
     </Vertical>
 };
 
-function dragListener(mousePositionRef: React.MutableRefObject<{ current: number; next: number; dragActive: boolean }>, onResize: (colIndex: number, height: number) => void, index: number, containerRef: React.MutableRefObject<HTMLDivElement>, handlerRef: React.MutableRefObject<HTMLDivElement>, dragDirection: 'vertical' | 'horizontal' = 'vertical') {
+function dragListener(mousePositionRef: React.MutableRefObject<{ current: number; next: number; dragActive: boolean }>, onResize: (colIndex: number, height: number) => void, index: number, containerRef: React.MutableRefObject<HTMLDivElement|null>, handlerRef: React.MutableRefObject<HTMLDivElement|null>, dragDirection: 'vertical' | 'horizontal' = 'vertical') {
     return (event: ReactMouseEvent<HTMLDivElement, MouseEvent>) => {
 
         event.preventDefault();
@@ -173,14 +179,14 @@ function dragListener(mousePositionRef: React.MutableRefObject<{ current: number
             if (!mousePositionRef.current.dragActive) {
                 return;
             }
-
+            invariant(containerRef.current,'Container is not mounted');
+            invariant(handlerRef.current,'Handler is not mounted');
             if (isVertical && (event.clientY <= containerRef.current.getBoundingClientRect().y)) {
                 return;
             }
             if ((!isVertical) && (event.clientX <= containerRef.current.getBoundingClientRect().x)) {
                 return;
             }
-
             mousePositionRef.current.next = mousePositionRef.current.current - (isVertical ? event.clientY : event.clientX);
             mousePositionRef.current.current = isVertical ? event.clientY : event.clientX;
             cellHeight = ((isVertical ? handlerRef.current.offsetTop : handlerRef.current.offsetLeft) - mousePositionRef.current.next);
@@ -198,8 +204,6 @@ function dragListener(mousePositionRef: React.MutableRefObject<{ current: number
     };
 }
 
-
-const defaultDif = document.createElement('div');
 
 interface GridSortItem {
     field: string,
@@ -505,7 +509,7 @@ export function Grid(gridProps: GridProps) {
     const [$gridSort, setGridSort] = useObserver<Array<GridSortItem>>([]);
     const [$focusedDataItem, setFocusedDataItem] = useObserver(focusedDataItem);
     const [$pinnedLeftColumnWidth, setPinnedLeftColumnWidth] = useObserver(0);
-    const viewportRef = useRef(defaultDif);
+    const viewportRef = useRef<HTMLDivElement>(null);
 
     const gridHeaderRef = useRef<SheetRef>({
         setScrollerPosition: () => {
@@ -521,7 +525,10 @@ export function Grid(gridProps: GridProps) {
         }
     });
     const hideLeftColumnIndex = pinnedLeftColumnIndex !== undefined && pinnedLeftColumnIndex >= 0 ? pinnedLeftColumnIndex : -1;
-    useEffect(() => setViewPortDimension(viewportRef.current.getBoundingClientRect()), [setViewPortDimension]);
+    useEffect(() => {
+        invariant(viewportRef.current,'Viewport Ref must nut null');
+        setViewPortDimension(viewportRef.current.getBoundingClientRect())
+    }, [setViewPortDimension]);
     useEffect(() => setFocusedDataItem(focusedDataItem), [focusedDataItem, setFocusedDataItem]);
     useObserverListener([$viewPortDimension, $columns], () => {
         if ($viewPortDimension.current.width > 0) {
