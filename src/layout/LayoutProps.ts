@@ -94,7 +94,7 @@ export function useLayoutPropsValue(props: LayoutProps, isHorizontal: boolean) {
         ...properties
     } = props;
 
-    const propsStyleString = JSON.stringify(propsStyle ?? '{}');
+    const propsStyleString = JSON.stringify(propsStyle ?? {});
 
     const style = useMemo(() => {
         const propsStyle: any = JSON.parse(propsStyleString);
