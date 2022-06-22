@@ -1,5 +1,5 @@
 import {CSSProperties, HTMLAttributes, useMemo} from "react";
-
+import {calculateBrightness} from "../utils";
 
 export interface LayoutProps extends HTMLAttributes<HTMLDivElement> {
     hAlign?: 'left' | 'right' | 'center';
@@ -110,7 +110,7 @@ export function useLayoutPropsValue(props: LayoutProps, isHorizontal: boolean) {
         localStyle.borderTopRightRadius = rTR;
         localStyle.borderBottomLeftRadius = rBL;
         localStyle.borderBottomRightRadius = rBR;
-        localStyle.backgroundColor = backgroundColor;
+        localStyle.backgroundColor = backgroundColor ? calculateBrightness(backgroundColor, backgroundBrightness || 0, backgroundOpacity || 1) : backgroundColor;
         localStyle.position = position;
         localStyle.top = top;
         localStyle.left = left;
