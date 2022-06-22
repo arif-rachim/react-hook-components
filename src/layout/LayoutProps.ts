@@ -1,5 +1,5 @@
 import {CSSProperties, HTMLAttributes, useMemo} from "react";
-import {calculateBrightness} from "../utils";
+
 
 export interface LayoutProps extends HTMLAttributes<HTMLDivElement> {
     hAlign?: 'left' | 'right' | 'center';
@@ -33,30 +33,16 @@ export interface LayoutProps extends HTMLAttributes<HTMLDivElement> {
     bottom?: number;
 }
 
-const H_ALIGN = {
-    horizontal: {
-        left: 'flex-start',
-        right: 'flex-end',
-        center: 'center'
-    },
-    vertical: {
-        left: 'flex-start',
-        right: 'flex-end',
-        center: 'center'
-    }
+const JUSTIFY_CONTENT = {
+    left: 'flex-start',
+    right: 'flex-end',
+    center: 'center'
 }
 
-const V_ALIGN = {
-    horizontal: {
-        top: 'flex-start',
-        bottom: 'flex-end',
-        center: 'center'
-    },
-    vertical: {
-        top: 'flex-start',
-        bottom: 'flex-end',
-        center: 'center'
-    }
+const ALIGN_ITEMS ={
+    top: 'flex-start',
+    bottom: 'flex-end',
+    center: 'center'
 }
 
 export function useLayoutPropsValue(props: LayoutProps, isHorizontal: boolean) {
@@ -98,8 +84,8 @@ export function useLayoutPropsValue(props: LayoutProps, isHorizontal: boolean) {
 
     const style = useMemo(() => {
         const propsStyle: any = JSON.parse(propsStyleString);
-        const justifyContent = hAlign === undefined ? hAlign : (isHorizontal ? H_ALIGN.horizontal : H_ALIGN.vertical)[hAlign];
-        const alignItems = vAlign === undefined ? vAlign : (isHorizontal ? V_ALIGN.horizontal : V_ALIGN.vertical)[vAlign];
+        const justifyContent = hAlign === undefined ? hAlign : JUSTIFY_CONTENT[hAlign];
+        const alignItems = vAlign === undefined ? vAlign : ALIGN_ITEMS[vAlign];
         const localStyle: any & CSSProperties = {};
         localStyle.display = 'flex';
         localStyle.flexDirection = isHorizontal ? 'row' : 'column';
@@ -116,15 +102,15 @@ export function useLayoutPropsValue(props: LayoutProps, isHorizontal: boolean) {
         localStyle.paddingBottom = pB;
         localStyle.width = w;
         localStyle.height = h;
-        localStyle.justifyContent = justifyContent;
-        localStyle.alignItems = alignItems;
+        localStyle.justifyContent = isHorizontal ? justifyContent : alignItems;
+        localStyle.alignItems = isHorizontal ? alignItems : justifyContent;
         localStyle.overflow = overflow;
         localStyle.borderRadius = r;
         localStyle.borderTopLeftRadius = rTL;
         localStyle.borderTopRightRadius = rTR;
         localStyle.borderBottomLeftRadius = rBL;
         localStyle.borderBottomRightRadius = rBR;
-        localStyle.backgroundColor = backgroundColor ? calculateBrightness(backgroundColor, backgroundBrightness || 0, backgroundOpacity || 1) : backgroundColor;
+        localStyle.backgroundColor = backgroundColor;
         localStyle.position = position;
         localStyle.top = top;
         localStyle.left = left;
