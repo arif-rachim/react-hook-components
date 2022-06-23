@@ -12,15 +12,15 @@ interface PanelItem {
     overlayHidden: boolean
 }
 
-const emptyDiv = document.createElement('div');
 const animationDuration = 300;
 
 function SlidePanelChild(props: { index: number, $containerDimension: Observer<{ width: number; height: number }>, panel: PanelItem }) {
     const [showPanel, setShowPanel] = useState(false);
-    const childContainerRef = useRef(emptyDiv);
+    const childContainerRef = useRef<HTMLDivElement|null>(null);
     const animation = props.panel.animation;
     const style: any = {};
-    const {height: childHeight, width: childWidth} = childContainerRef.current.getBoundingClientRect();
+
+    const {height: childHeight, width: childWidth} = childContainerRef.current ? childContainerRef.current.getBoundingClientRect() : {height:0,width:0};
 
     if (animation === "top") {
         style.bottom = props.$containerDimension.current.height - (showPanel ? childHeight : 0);
@@ -62,7 +62,7 @@ function SlidePanelChild(props: { index: number, $containerDimension: Observer<{
         boxSizing: 'border-box',
         overflow: 'auto', ...props.$containerDimension.current, ...style
     }}>
-        <Vertical ref={childContainerRef}>
+        <Vertical ref={(dom) => childContainerRef.current = dom}>
             {props.panel.panel}
         </Vertical>
     </Vertical>;
@@ -78,20 +78,25 @@ export interface ConfigType {
 }
 
 function OverlayPanel(props: { hasPanel: boolean, $containerDimension: Observer<{ width: number, height: number }> }) {
-    const domRef = useRef(emptyDiv);
+    const domRef = useRef<HTMLDivElement|null>(null);
     const hasPanel = props.hasPanel;
 
     useEffect(() => {
-
+        if(!domRef.current){
+            return;
+        }
         if (hasPanel) {
             domRef.current.style.zIndex = '0';
         } else {
             setTimeout(() => {
+                if(!domRef.current){
+                    return;
+                }
                 domRef.current.style.zIndex = '-1';
             }, animationDuration)
         }
     }, [hasPanel]);
-    return <Vertical ref={domRef} style={{
+    return <Vertical ref={(dom) => domRef.current = dom} style={{
         backgroundColor: `rgba(0,0,0,${props.hasPanel ? 0.2 : 0})`, ...props.$containerDimension.current,
         top: 0,
         left: 0,
@@ -118,7 +123,7 @@ export function useSlidePanel(): { showPanel: ShowPanelCallback; SlidePanel: Rea
 
     const [$panels, setPanels] = useObserver<Array<PanelItem>>([]);
     const [$containerDimension, setContainerDimension] = useObserver({width: 0, height: 0});
-    const containerRef = useRef(emptyDiv);
+    const containerRef = useRef<HTMLDivElement|null>(null);
     return useMemo(() => {
         function showPanel(constructor: ShowPanelType, config: ConfigType = {animation: "top", overlayHidden: false}) {
             return new Promise((resolve) => {
@@ -138,7 +143,7 @@ export function useSlidePanel(): { showPanel: ShowPanelCallback; SlidePanel: Rea
                     }
                 }
 
-                const {width, height} = containerRef.current.getBoundingClientRect();
+                const {width, height} = containerRef.current ? containerRef.current.getBoundingClientRect() : {width:0,height:0};
                 const Panel = constructor((result: any) => {
                     setOpen(false);
                     setTimeout(() => {
@@ -166,6 +171,9 @@ export function useSlidePanel(): { showPanel: ShowPanelCallback; SlidePanel: Rea
         function SlidePanel(props: React.HTMLAttributes<HTMLDivElement>) {
             const {style, ...properties} = props;
             useEffect(() => {
+                if(!containerRef.current){
+                    return;
+                }
                 const {width, height} = containerRef.current.getBoundingClientRect();
                 setContainerDimension({width, height});
             }, []);
